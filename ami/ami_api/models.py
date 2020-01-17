@@ -1,4 +1,5 @@
 from django.db import models
+from .customutils import *
 
 # Create your models here.
 
@@ -6,7 +7,7 @@ class GeoNote(models.Model):
     id = models.IntegerField(unique=True, primary_key=True)
     user = models.CharField(max_length=60)
     field = models.CharField(max_length=60)
-    date = models.DateTimeField(auto_now=True)
+    date = models.DateTimeField(auto_now=False)
     latitude = models.DecimalField(max_digits=12,decimal_places=4,default=0,)
     longitude = models.DecimalField(max_digits=12,decimal_places=4, default=0)
     value =  models.CharField(max_length=60)
@@ -17,13 +18,17 @@ class StackedImage(models.Model):
     id = models.IntegerField(unique=True, primary_key=True)
     user = models.CharField(max_length=60)
     field = models.CharField(max_length=60)
-    date = models.DateTimeField(auto_now=True)
-    filepath = models.URLField(max_length=200)
+    date = models.DateField(auto_now=False)
+    filepath = models.CharField(max_length=200)
+    demfilepath = models.CharField(max_length=200)
 
 class OverlayImage(models.Model):
     id = models.IntegerField(unique=True, primary_key=True)
     user = models.CharField(max_length=60)
     field = models.CharField(max_length=60)
     index_name = models.CharField(max_length=60)
-    date = models.DateTimeField(auto_now=True)
-    filepath = models.URLField(max_length=200)
+    date = models.DateField(auto_now=False)
+    filepath = models.CharField(max_length=200)
+    metadatafilepath = models.CharField(max_length=200)
+    scalefilepath = models.CharField(max_length=200)
+

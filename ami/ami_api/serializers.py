@@ -10,9 +10,9 @@ class GeoNoteSerializer(serializers.HyperlinkedModelSerializer):
 class StackedImageSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = StackedImage
-        fields = ('id','user','field','date','filepath')
+        fields = ('id','user','field','date','filepath','demfilepath')
 
 class OverlayImageSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = OverlayImage
-        fields = ('id','user','field','date','index_name','filepath')
+        fields = ('id','user','field','date','index_name','filepath', 'metadatafilepath', 'scalefilepath')
