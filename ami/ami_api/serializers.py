@@ -7,6 +7,11 @@ class GeoNoteSerializer(serializers.HyperlinkedModelSerializer):
         model = GeoNote
         fields = ('id','user','field','date','latitude','longitude','value')
 
+class UserSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = User
+        fields = ('id','user','password','fields')
+
 class StackedImageSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = StackedImage

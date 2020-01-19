@@ -1,0 +1,32 @@
+.Wrapper{
+    position: relative;
+    height: 100%;
+    width: 100%;
+}
+
+.BaseMap{
+    z-index: -1;
+}
+
+.Button1{
+    position: absolute;
+    top: 0;
+    left: 0;
+    
+}
+
+.Button2{
+    position: absolute;
+    top: 0;
+    left: 0;
+    
+}
+
+.Button3{
+    width: 10%;
+    height: 8%;
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    z-index: 6;
+}

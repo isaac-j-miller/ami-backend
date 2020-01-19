@@ -17,9 +17,49 @@ class GeoNoteViewSet(viewsets.ModelViewSet):
     queryset = GeoNote.objects.all().order_by('user')
     serializer_class = GeoNoteSerializer
 
+class UserViewSet(viewsets.ModelViewSet):
+    queryset = User.objects.all().order_by('user')
+    serializer_class = UserSerializer
+    @action(methods=['get'], detail=True)
+    #TODO: make this not so blatantly insecure
+    def authenticate(self, httprequest: HttpRequest, pk=None):
+        sql = sqlite3.connect('./db.sqlite3')
+        sql_cursor = sql.cursor()
+        if httprequest.method == 'GET':
+            req_data = httprequest.GET.dict()
+            resp = sql_cursor.execute('SELECT * FROM ami_api_user WHERE user=? AND password=?;',
+                                        [req_data['user'],req_data['password']])
+            sql_init_response = [_ for _ in resp][0]
+            print(sql_init_response)
+            if not sql_init_response:
+                return JsonResponse({'correct':0,'fields':[]})
+            else:
+                return JsonResponse({'correct':1,'fields':sql_init_response[3].split(',')})
+        else:
+            return HttpResponse(status=400)
+        
+
 class StackedImageViewSet(viewsets.ModelViewSet):
     queryset = StackedImage.objects.all().order_by('user')
     serializer_class = StackedImageSerializer
+    @action(methods=['get'], detail=True)
+    def request_dates(self,httprequest: HttpRequest, pk=None):
+        sql = sqlite3.connect('./db.sqlite3')
+        sql_cursor = sql.cursor()
+        if httprequest.method == 'GET':
+            req_data = httprequest.GET.dict()
+            print('req data:',req_data)
+            conditions=' AND'.join([" {}='{}'".format(key,value) for key, value in req_data.items()])
+            print(conditions)
+            command='SELECT date FROM ami_api_stackedimage WHERE'+conditions
+            print(command)
+            resp=sql_cursor.execute(command)
+            resp=[_ for _ in resp][0]
+            print(resp)
+            return JsonResponse({'dates':resp})
+            
+        else:
+            return HttpResponse(status=400)
 
 class OverlayImageViewSet(viewsets.ModelViewSet):
     queryset = OverlayImage.objects.all().order_by('user')
@@ -74,5 +114,12 @@ class OverlayImageViewSet(viewsets.ModelViewSet):
         else:
             return HttpResponse(status=400)
         return JsonResponse(data)
+    @action(methods=['get'], detail=True)
+    def possible_overlays(self,httprequest: HttpRequest, pk=None):
+        if httprequest.method == 'GET':
+            overlays = [key for key in ig.colormaps.keys()]
+            return JsonResponse({'overlays':overlays})
+        else:
+            return HttpResponse(status=400)
 
 

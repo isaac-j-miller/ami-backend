@@ -14,6 +14,14 @@ class GeoNote(models.Model):
     def __str__(self):
         return self.value
 
+class User(models.Model):
+    id = models.IntegerField(unique=True, primary_key=True)
+    user = models.CharField(max_length=60)
+    password = models.CharField(max_length=20)
+    fields = models.CharField(max_length=10000)
+    def __str__(self):
+        return self.user
+
 class StackedImage(models.Model):
     id = models.IntegerField(unique=True, primary_key=True)
     user = models.CharField(max_length=60)
