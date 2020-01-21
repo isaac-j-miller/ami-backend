@@ -8,8 +8,8 @@ class GeoNote(models.Model):
     user = models.CharField(max_length=60)
     field = models.CharField(max_length=60)
     date = models.DateTimeField(auto_now=False)
-    latitude = models.DecimalField(max_digits=12,decimal_places=4,default=0,)
-    longitude = models.DecimalField(max_digits=12,decimal_places=4, default=0)
+    latitude = models.DecimalField(max_digits=14,decimal_places=10,default=0,)
+    longitude = models.DecimalField(max_digits=14,decimal_places=10, default=0)
     value =  models.CharField(max_length=60)
     def __str__(self):
         return self.value
@@ -37,6 +37,6 @@ class OverlayImage(models.Model):
     index_name = models.CharField(max_length=60)
     date = models.DateField(auto_now=False)
     filepath = models.CharField(max_length=200)
-    metadatafilepath = models.CharField(max_length=200)
+    tiffilepath = models.CharField(max_length=200)
     scalefilepath = models.CharField(max_length=200)
 

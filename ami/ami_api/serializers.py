@@ -20,4 +20,4 @@ class StackedImageSerializer(serializers.HyperlinkedModelSerializer):
 class OverlayImageSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = OverlayImage
-        fields = ('id','user','field','date','index_name','filepath', 'metadatafilepath', 'scalefilepath')
+        fields = ('id','user','field','date','index_name','filepath', 'tiffilepath', 'scalefilepath')

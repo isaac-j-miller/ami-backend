@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import axios from 'axios'
-
+import styles from '../Components/Style/LoginStyle.css'
 class Login extends Component{
     constructor(props){
         super(props);
@@ -34,6 +34,7 @@ class Login extends Component{
                 this.props.parent.sideBarRef.current.state.fields=fields
                 this.props.parent.sideBarRef.current.getFields()
                 this.props.parent.sideBarRef.current.getDates()
+                this.props.parent.setState({loggedIn:true})
             }
             else{
                 alert('Login Unsuccessful')
@@ -49,8 +50,9 @@ class Login extends Component{
 
     render(){
         return (
-        <div >
+        <div className='login-wrapper'>
             <form onSubmit={this.handleSubmit}>
+                <h1>Log In</h1>
                 <label>Username:
                     <input type="text" name = "username" value={this.state.username} onChange={this.handleUsernameChange}/>
                 </label>

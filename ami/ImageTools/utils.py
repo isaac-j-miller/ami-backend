@@ -1,4 +1,4 @@
-import osgeo
+import gdal, rasterio
 import subprocess
 
 def convert(input_filename, output_filename, verbose=False, **kwargs):
@@ -25,3 +25,6 @@ def convert(input_filename, output_filename, verbose=False, **kwargs):
     if verbose: 
         print(answer.decode('ANSI'))
     return output_filename
+
+
+    

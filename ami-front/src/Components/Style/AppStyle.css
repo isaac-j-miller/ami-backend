@@ -1,0 +1,39 @@
+@import 'GeneralStyle.css';
+.login-wrapper-large{
+    z-index: 101;
+    background: grey;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: url(https://images.unsplash.com/photo-1563514227147-6d2ff665a6a0?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60);
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-color: grey;
+}
+.login-wrapper-hidden{
+    display: none;
+}
+.nav-bar-wrapper{
+    background-color: transparent;
+    z-index: 100;
+    height:10vh;
+    position: fixed;
+    top:0;
+    width: 100vw;
+}
+.side-bar-wrapper{
+    background-color: transparent;
+    z-index: 99;
+    position: fixed;
+    top:9vh;
+}
+.map-wrapper{
+    z-index: 0;
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+}

@@ -1,0 +1,18 @@
+@import 'GeneralStyle.css';
+.icon{
+    height: 2rem;
+    width: auto;
+    padding: 1rem;
+}
+.navbar{
+    display: inline-flex;
+    flex-direction: row;
+    align-content: flex-start;
+    background-color: rgba(255, 255, 255, 1);
+    width: 100vw;
+    color: black;
+}
+.navbar-header{
+    padding: 1rem;
+    vertical-align: middle;
+}

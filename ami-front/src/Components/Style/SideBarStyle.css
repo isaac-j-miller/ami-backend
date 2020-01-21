@@ -1,0 +1,33 @@
+@import 'GeneralStyle.css';
+.sidebar-hidden{
+    transform: translateY(-100%);
+    
+}
+.sidebar-visible{
+    display: flex;
+    flex-direction: column;
+    background: grey;
+    align-content: flex-start;
+    max-width: 15vw;
+    transition-duration: 500ms;
+    background-color: rgba(255, 255, 255, 0.5);
+    height: auto;
+}
+.sidebar-button{
+    margin: 0.5rem;
+}
+.subitem-visible{
+    transition-delay: 500ms;
+    display: initial;
+}
+.subitem-hidden{
+    display: none;
+}
+select{
+    margin: 0.5rem;
+    margin-bottom:0rem;
+}
+label{
+    margin: 0.5rem;
+    margin-bottom: 0rem
+}

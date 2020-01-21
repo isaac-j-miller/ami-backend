@@ -1,9 +1,10 @@
 import React from 'react';
-import Map from './Components/Map.js'
-import ToolBar from './Components/NavigationBar/ToolBar.js' 
+import Map from './Components/Map'
+import NavBar from './Components/NavBar' 
 import SideBar from './Components/SideBar'
 import Login from './Components/Login'
 import axios from 'axios'
+import styles from './Components/Style/AppStyle.css'
 
 class App extends React.Component {
   constructor(props){
@@ -12,7 +13,7 @@ class App extends React.Component {
     this.toolBarRef = React.createRef();
     this.sideBarRef = React.createRef();
     this.mapRef = React.createRef();
-  
+    this.getLoginClassName = this.getLoginClassName.bind(this);
   }
   state = {
       sideDrawerOpen: false,  
@@ -21,15 +22,16 @@ class App extends React.Component {
       activeField:'',
       activeDate:'',
       overlays:[],
-      activeOverlay:''
-  }
+      activeOverlay:'',
+      loggedIn: false
+  } 
   componentDidMount(){
     axios.get(`http://localhost:8000/overlays/req/possible_overlays/?`)
         .then(res =>{
             const info = res.data;
             this.state.overlays=info.overlays;
-            console.log('overlaysrequest:')
-            console.log(info);
+            //console.log('overlaysrequest:')
+            //console.log(info);
             this.sideBarRef.current.setState({overlays:info.overlays});
             this.sideBarRef.current.getOverlays();
         })
@@ -44,13 +46,37 @@ class App extends React.Component {
     
     this.sideBarRef.current.setState({user:this.state.user, fields:this.state.fields})
   }
+  getLoginClassName(){
+    if(!this.state.loggedIn){
+      return 'login-wrapper-large'
+    }
+    else{
+      return 'login-wrapper-hidden'
+    }
+  }
+  renderMap(){
+    if(this.state.user!=''){
+      return(<Map parent={this} id='map' ref={this.mapRef}/>)
+    }
+    else{
+      return <div/>
+    }
+  }
   render() {
    return (
      <div>
-       <Login parent={this} id='login' ref={this.loginRef}/>
-       <ToolBar parent={this} id='toolbar' ref={this.toolBarRef}/>
-       <SideBar parent={this} id='sidebar' ref={this.sideBarRef}/>
-       <Map parent={this} id='map' ref={this.mapRef}/>
+       <div className={this.getLoginClassName()}>
+        <Login parent={this} id='login' ref={this.loginRef}/>
+       </div>
+       <div className='nav-bar-wrapper'>
+        <NavBar parent={this} id='toolbar' ref={this.toolBarRef}/>
+      </div>
+      <div className='side-bar-wrapper'>
+        <SideBar parent={this} id='sidebar' ref={this.sideBarRef}/>
+       </div>
+       <div className='map-wrapper'>
+       {this.renderMap()}
+       </div>
      </div>
    )
   }

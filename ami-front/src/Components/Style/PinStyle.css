@@ -1,0 +1,21 @@
+@import 'GeneralStyle.css';
+.popup-div{
+    background-color: white;
+    display: flex;
+    flex-direction: row;
+    background-color: rgba(255,255,255,0.5);
+    border-color:black;
+    border-style: solid;
+    border-width: 2px;
+    border-radius: 0.5rem;
+}
+.popup-hidden{
+    display: None
+}
+.vertical-form{
+    display: flex;
+    flex-direction: column;
+}
+.button-container{
+    display: inline-block;
+}
