@@ -16,7 +16,7 @@ class GeoNote(models.Model):
 
 class User(models.Model):
     id = models.IntegerField(unique=True, primary_key=True)
-    user = models.CharField(max_length=60)
+    user = models.CharField(max_length=60, unique=True)
     password = models.CharField(max_length=20)
     fields = models.CharField(max_length=10000)
     def __str__(self):
@@ -39,4 +39,3 @@ class OverlayImage(models.Model):
     filepath = models.CharField(max_length=200)
     tiffilepath = models.CharField(max_length=200)
     scalefilepath = models.CharField(max_length=200)
-

@@ -40,8 +40,12 @@ class GeoNoteViewSet(viewsets.ModelViewSet):
         sql_cursor = sql.cursor()
         if httprequest.method == 'GET':
             max_id=sql_cursor.execute('SELECT MAX(id) FROM ami_api_geonote')
-            max_id=sql_cursor.fetchone()[0]+1
-            return JsonResponse({'id':max_id})
+            
+            max_id=sql_cursor.fetchone()[0]
+            if max_id is not None:
+                return JsonResponse({'id':max_id+1})
+            else:
+                return JsonResponse({'id':0})
     @action(methods=['get'], detail=True)
     def del_id(self, httprequest: HttpRequest, pk=None):
         sql = sqlite3.connect('./db.sqlite3')
@@ -92,17 +96,60 @@ class UserViewSet(viewsets.ModelViewSet):
         sql_cursor = sql.cursor()
         if httprequest.method == 'GET':
             req_data = httprequest.GET.dict()
-            resp = sql_cursor.execute('SELECT * FROM ami_api_user WHERE user=? AND password=?;',
+            resp = sql_cursor.execute('SELECT id,user,password,fields FROM ami_api_user WHERE user=? AND password=?;',
                                         [req_data['user'],req_data['password']])
-            sql_init_response = [_ for _ in resp][0]
-            print(sql_init_response)
-            if not sql_init_response:
-                return JsonResponse({'correct':0,'fields':[]})
-            else:
-                return JsonResponse({'correct':1,'fields':sql_init_response[3].split(',')})
+            try:
+                sql_init_response = resp.fetchone()
+                print(sql_init_response)
+                fields = sql_init_response[3].split(',')
+                print('fields:',fields)
+                if len(fields)==1 and fields[0]=='':
+                    origins = {}
+                else:
+                    origins = {f:self.get_field_location(req_data['user'], f) for f in fields}
+                print('origins:',origins)
+                return JsonResponse({'correct':1,'fields':fields, 'origins':origins})
+            except IndexError:
+                return JsonResponse({'correct':0,'fields':[], 'origins': {}})
+            except TypeError:
+                return JsonResponse({'correct':0,'fields':[], 'origins': {}})
+            
         else:
             return HttpResponse(status=400)
-        
+    @action(methods=['get'], detail=True)
+    def get_next_id(self, httprequest: HttpRequest, pk=None):
+        sql = sqlite3.connect('./db.sqlite3')
+        sql_cursor = sql.cursor()
+        if httprequest.method == 'GET':
+            max_id=sql_cursor.execute('SELECT MAX(id) FROM ami_api_user')
+            max_id=sql_cursor.fetchone()[0]+1
+            return JsonResponse({'id':max_id})
+        else:
+            return HttpResponse(status=400)
+    
+    @action(methods=['get'], detail=True)
+    def add_user(self, httprequest: HttpRequest, pk=None):
+        sql = sqlite3.connect('./db.sqlite3')
+        sql_cursor = sql.cursor()
+        if httprequest.method == 'GET':
+            req_data = httprequest.GET.dict()
+            sql_cursor.execute('INSERT INTO ami_api_user (id,user,password,fields) VALUES (?,?,?,?)',[req_data['id'],req_data['user'],req_data['password'],''])
+            sql.commit()
+            return HttpResponse(status=200)
+        else:
+            return HttpResponse(status=400)
+
+    def get_field_location(self,user, field):
+        sql = sqlite3.connect('./db.sqlite3')
+        sql_cursor = sql.cursor()
+        resp = sql_cursor.execute('SELECT filepath FROM ami_api_stackedimage WHERE user=? AND field=?',[user, field])
+        resp = resp.fetchone()[0]
+        box = get_tif_bbox(resp)
+        lat = (box[1]+box[3])/2
+        lon = (box[0]+box[2])/2
+        print('field:',field,'response:', resp)
+        return {'latitude':lat,'longitude':lon}
+
 
 class StackedImageViewSet(viewsets.ModelViewSet):
     queryset = StackedImage.objects.all().order_by('user')
@@ -113,15 +160,18 @@ class StackedImageViewSet(viewsets.ModelViewSet):
         sql_cursor = sql.cursor()
         if httprequest.method == 'GET':
             req_data = httprequest.GET.dict()
-            print('req data:',req_data)
+            #print('req data:',req_data)
             conditions=' AND'.join([" {}='{}'".format(key,value) for key, value in req_data.items()])
-            print(conditions)
+            #print(conditions)
             command='SELECT date FROM ami_api_stackedimage WHERE'+conditions
-            print(command)
+            #print(command)
             resp=sql_cursor.execute(command)
-            resp=[_ for _ in resp][0]
-            print(resp)
-            return JsonResponse({'dates':resp})
+            try:
+                resp=[_ for _ in resp][0]
+                #print(resp)
+                return JsonResponse({'dates':resp})
+            except IndexError:
+                return JsonResponse({'dates':[]})
             
         else:
             return HttpResponse(status=400)
@@ -135,17 +185,17 @@ class OverlayImageViewSet(viewsets.ModelViewSet):
         sql_cursor = sql.cursor()
         if httprequest.method == 'GET':
             req_data = httprequest.GET.dict()
-            print(req_data)
+            #print(req_data)
             resp = sql_cursor.execute('SELECT * FROM ami_api_overlayimage WHERE user=? AND field=? AND date=? AND index_name=?;',
                                         [req_data['user'],req_data['field'],req_data['date'],req_data['index_name']])
             sql_init_response = [_ for _ in resp]
-            print(sql_init_response)
+            #print(sql_init_response)
             if not sql_init_response:
                 #this means that there is not an overlay that meets the qualifications
                 resp2=sql_cursor.execute('SELECT filepath, demfilepath FROM ami_api_stackedimage WHERE user=? AND field=? AND date=?;', 
                                         [req_data['user'],req_data['field'],req_data['date']])
                 sql_sec_response = [_ for _ in resp2]
-                print(sql_sec_response)
+                #print(sql_sec_response)
                 if sql_sec_response:
                     #if there is a stacked image that can be used, generate the requested index from that
                     imagefilepath = sql_sec_response[0][0]
@@ -157,12 +207,12 @@ class OverlayImageViewSet(viewsets.ModelViewSet):
                     bounds = get_tif_bbox(tif)
                     data = {'available':1,'png':png, 'bounds':bounds,'scale':scale}
                     max_id=sql_cursor.execute('SELECT MAX(id) FROM ami_api_overlayimage')
-                    print(max_id)
+                    #print(max_id)
                     max_id = [_ for _ in max_id][0]
-                    print(max_id)
+                    #print(max_id)
                     
                     max_id=(max_id[0] if max_id[0] else 0)+1
-                    print(max_id)
+                    #print(max_id)
                     sql_cursor.execute('INSERT INTO ami_api_overlayimage (id, user, field, index_name, date, filepath, tiffilepath, scalefilepath) VALUES (?,?,?,?,?,?,?,?);',
                                         [max_id, req_data['user'],req_data['field'], req_data['index_name'],req_data['date'],png, tif, scale])
                     sql.commit()

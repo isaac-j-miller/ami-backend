@@ -9,6 +9,7 @@ class Login extends Component{
         this.handleUsernameChange = this.handleUsernameChange.bind(this);
         this.handlePasswordChange = this.handlePasswordChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
+        this.handleNewUser = this.handleNewUser.bind(this);
     }
     
     handleUsernameChange(event) {
@@ -17,27 +18,38 @@ class Login extends Component{
     handlePasswordChange(event) {
         this.setState({password: event.target.value});
     }
-    
+    handleNewUser(){
+        axios.get(`http://localhost:8000/users/req/get_next_id/?`)
+        .then(res=>{
+            const id = res.data.id;
+            axios.get(`http://localhost:8000/users/req/add_user/?id=${id}&user=${this.state.username}&password=${this.state.password}`)
+        }).then(this.logIn({fields:[],origins:{}}));
+    }
+    logIn(info){
+        this.props.parent.state.user=this.state.username;
+        this.props.parent.sideBarRef.current.state.user=this.state.username;
+        let fields=info.fields;
+        this.props.parent.state.fields=fields;
+        this.props.parent.sideBarRef.current.state.fields=fields;
+        this.props.parent.sideBarRef.current.getFields();
+        this.props.parent.sideBarRef.current.getDates();
+        this.props.parent.setState({loggedIn:true});
+        this.props.parent.setState({origins:info.origins});
+        this.props.parent.sideBarRef.current.setNewViewPort();
+    }
     handleSubmit(event) {
-        
-        event.preventDefault();
-        axios.get(`http://localhost:8000/users/?user=${this.state.username}&password=${this.state.password}`)
+        if(typeof event !== 'undefined'){
+            event.preventDefault();
+        }
+        axios.get(`http://localhost:8000/users/req/authenticate/?user=${this.state.username}&password=${this.state.password}`)
         .then(res =>{
             const info = res.data;
             console.log(info);
-            if(this.state.password===info[0].password){
-                
-                this.props.parent.state.user=this.state.username;
-                this.props.parent.sideBarRef.current.state.user=this.state.username;
-                let fields=info[0].fields.split(',');
-                this.props.parent.state.fields=fields
-                this.props.parent.sideBarRef.current.state.fields=fields
-                this.props.parent.sideBarRef.current.getFields()
-                this.props.parent.sideBarRef.current.getDates()
-                this.props.parent.setState({loggedIn:true})
+            if(info.correct){
+                this.logIn(info);
             }
             else{
-                alert('Login Unsuccessful')
+                alert('Login Unsuccessful');
             }
         })
         .catch(function(error){
@@ -52,15 +64,17 @@ class Login extends Component{
         return (
         <div className='login-wrapper'>
             <form onSubmit={this.handleSubmit}>
-                <h1>Log In</h1>
+                <h1>skyprecision</h1>
                 <label>Username:
                     <input type="text" name = "username" value={this.state.username} onChange={this.handleUsernameChange}/>
                 </label>
                 <label>Password:
                     <input type="password" name = "password" value={this.state.password} onChange={this.handlePasswordChange}/>
                 </label>
-                <input type="submit" name = "submit"/>
-                
+                <div>
+                    <input type="submit" name = "Log In" value="Log In"/>
+                    <input type="button" name = "Create New Account" value="Create New Account" onClick={this.handleNewUser}/>
+                </div>
             </form>
         </div>
         )

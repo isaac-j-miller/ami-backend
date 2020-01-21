@@ -23,13 +23,14 @@ class App extends React.Component {
       activeDate:'',
       overlays:[],
       activeOverlay:'',
-      loggedIn: false
+      loggedIn: false,
+      origins: null
   } 
   componentDidMount(){
     axios.get(`http://localhost:8000/overlays/req/possible_overlays/?`)
         .then(res =>{
             const info = res.data;
-            this.state.overlays=info.overlays;
+            this.setState({overlays:info.overlays});
             //console.log('overlaysrequest:')
             //console.log(info);
             this.sideBarRef.current.setState({overlays:info.overlays});
@@ -43,7 +44,6 @@ class App extends React.Component {
     this.setState({activeField:field})
   }
   updateSideBar(){
-    
     this.sideBarRef.current.setState({user:this.state.user, fields:this.state.fields})
   }
   getLoginClassName(){
@@ -55,7 +55,7 @@ class App extends React.Component {
     }
   }
   renderMap(){
-    if(this.state.user!=''){
+    if(this.state.loggedIn){
       return(<Map parent={this} id='map' ref={this.mapRef}/>)
     }
     else{

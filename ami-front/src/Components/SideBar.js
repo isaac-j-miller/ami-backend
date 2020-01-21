@@ -23,6 +23,7 @@ class SideBar extends Component{
         this.handleRequestOverlay = this.handleRequestOverlay.bind(this);
         this.handleRemoveOverlay = this.handleRemoveOverlay.bind(this);
         this.handleTogglePins=this.handleTogglePins.bind(this);
+        this.setNewViewPort=this.setNewViewPort.bind(this);
         //this.getSubItemClass=this.getSubItemClass.bind(this);
         this.fieldsRef=React.createRef();
         this.datesRef=React.createRef();
@@ -37,7 +38,21 @@ class SideBar extends Component{
         //console.log(event.target.value);
         this.props.parent.setState({activeField:event.target.value});
         this.setState({activeField:event.target.value});
-        
+        this.setNewViewPort()
+    }
+    setNewViewPort(){
+        if(this.props.parent.state.origins!==null & this.state.activeField!==''){
+            let lat = this.props.parent.state.origins[this.state.activeField].latitude;
+            let lon = this.props.parent.state.origins[this.state.activeField].longitude;
+            console.log(`lat: ${lat}, lon: ${lon}`)
+            this.props.parent.mapRef.current.setState({viewport:{
+                latitude: lat,
+                longitude: lon,
+                zoom: 15,
+                offset: 0
+            }});
+            
+        }
     }
     handleTogglePins(){
         this.props.parent.mapRef.current.setState({displayPins:!this.props.parent.mapRef.current.state.displayPins})
@@ -63,7 +78,7 @@ class SideBar extends Component{
         axios.get(`http://localhost:8000/stacks/req/request_dates/?user=${this.state.user}&field=${this.state.activeField}`)
         .then(res =>{
             const info = res.data;
-            this.state.dates=info.dates;
+            this.setState({dates:info.dates});
             //console.log('datesrequest:')
             //console.log(info);
             //console.log(info.length);

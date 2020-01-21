@@ -13,11 +13,19 @@ export default class PinPopUp extends Component{
         }
     }
     getClass(){
-        if(this.state.visible){
+        if(this.state.visible & !this.props.parent.hidden){
             return 'popup-div'
         }
         else{
-            return 'popup-hidden'
+            return 'hidden'
+        }
+    }
+    getFormClass(){
+        if(this.state.visible & !this.props.parent.hidden){
+            return 'visible-form'
+        }
+        else{
+            return 'hidden-form'
         }
     }
     handleSubmit(event){
@@ -33,13 +41,14 @@ export default class PinPopUp extends Component{
     }
     handleDelete(){
         axios.get(`http://localhost:8000/notes/req/del_id/?id=${this.props.parent.state.id}`)
-        .then(this.props.grandparent.setState({pinsLoaded:false}))
+        .then(this.props.grandparent.startPinTimer())
+        .then(this.props.grandparent.setState({pinsLoaded:false}));
         
     }
     render(){
         return (
             <div className={this.getClass()}>
-                <form onSubmit={this.handleSubmit} className='vertical-form'>
+                <form onSubmit={this.handleSubmit} className={this.getFormClass()}>
                     <label>
                         Date:
                         <input type='datetime' name="date" value={this.props.parent.state.date} onChange={this.handleDateChange}/>

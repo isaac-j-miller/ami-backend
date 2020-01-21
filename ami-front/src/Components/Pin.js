@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import PinPopUp from './PinPopUp'
-const TOKEN = 'pk.eyJ1IjoiaXNhYWNqbWlsbGVyIiwiYSI6ImNrMTZ6NnBqdjFiM3czcHRrb3ZtbTZsajYifQ.3tv9y_9KCHST0M5NaDj4Zg'; // Set your mapbox token here
+import styles from './Style/PinStyle.css'
 
 const ICON = `M20.2,15.7L20.2,15.7c1.1-1.6,1.8-3.6,1.8-5.7c0-5.6-4.5-10-10-10S2,4.5,2,10c0,2,0.6,3.9,1.6,5.4c0,0.1,0.1,0.2,0.2,0.3
   c0,0,0.1,0.1,0.1,0.2c0.2,0.3,0.4,0.6,0.7,0.9c2.6,3.1,7.4,7.6,7.4,7.6s4.8-4.5,7.4-7.5c0.2-0.3,0.5-0.6,0.7-0.9
@@ -21,7 +21,8 @@ export default class Pin extends Component{
             date:this.props.date,
             latitude:this.props.latitude,
             longitude:this.props.longitude,
-            value:this.props.value
+            value:this.props.value,
+            hidden:false
         }
         this.size=20;
         this.popUpRef=React.createRef();
@@ -37,11 +38,19 @@ export default class Pin extends Component{
     componentDidMount(){
         console.log('marker has mounted')
     }
+    getClass(){
+        if(this.state.hidden){
+            return 'hidden'
+        }
+        else{
+            return 'visible'
+        }
+    }
     render(){
         return(
            
             <div>
-            <svg height={this.size} viewBox="0 0 24 24" style={pinStyle} onClick = {this.onClick}>
+            <svg height={this.size} viewBox="0 0 24 24" className={`pin-logo ${this.getClass()}`} onClick = {this.onClick}>
                 <path d={ICON} />
             </svg>
                 <PinPopUp ref={this.popUpRef} {...this.state} parent={this} grandparent={this.props.parent}/>

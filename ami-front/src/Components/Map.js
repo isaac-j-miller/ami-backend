@@ -10,21 +10,13 @@ const mapStyle = {
     openMapTile: 'https://api.maptiler.com/maps/hybrid/style.json?key=gQCnC8ZYWGvM8WdKZNmW'
   }
 
-  const geolocateStyle = {
-    position: 'absolute',
-    top: 0,
-    right: 0,
-    margin: 10,
-    
-  };
-
   
 export default class Map extends Component {
   constructor(props){
     super(props);
     this.state = {
       viewport: {
-        longitude: -78.4989,
+        longitude: -79.4989,
         latitude: 37.9307,
         zoom: 15,
         offset: 0
@@ -32,12 +24,15 @@ export default class Map extends Component {
       activeOverlay: null,
       displayPins: true,
       pinsLoaded: false,
-      markers: []
+      markers: [],
+      pinReady:true,
     }
     this.deckRef=React.createRef();
     this._onClickMethod=this._onClickMethod.bind(this);
+    this.startPinTimer=this.startPinTimer.bind(this);
     this.renderPins=this.renderPins.bind(this);
     this.updateWindowDimensions=this.updateWindowDimensions.bind(this);
+    
   }
   componentDidMount() {
     this.updateWindowDimensions();
@@ -48,33 +43,38 @@ export default class Map extends Component {
   updateWindowDimensions() {
     this.setState({ height: window.innerHeight-40+'px',width:window.innerWidth+'px' });
   }
-  
+  startPinTimer(){
+    console.log('pinready should be false')
+    this.setState({pinReady:false})
+    setTimeout(function(){this.setState({pinReady:true})}.bind(this),500);
+  }
   _onViewportChange = viewport => {
     this.setState({viewport});
   }
+  
   _onClickMethod(map,e){
+    e.preventDefault();
     console.log(e.lngLat)
     let lng = e.lngLat[0];
     let lat = e.lngLat[1];
     let id;
-    axios.get('http://localhost:8000/notes/req/get_next_id')
-    .then(res =>{
-      id = res.data.id;
-      let user = this.props.parent.state.user;
-      let field = this.props.parent.state.activeField;
-      let today = new Date();
-      let date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
-      let time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
-      let dateTime = date+' '+time;
-      axios.get(`http://localhost:8000/notes/req/update_add_note/?id=${id}&user=${user}&field=${field}&date=${dateTime}&latitude=${lat}&longitude=${lng}&value=${''}`)
-      .then( res =>{
-        this.setState({pinsLoaded:false})
-        
+    if(this.state.pinReady){
+      axios.get('http://localhost:8000/notes/req/get_next_id')
+      .then(res =>{
+        id = res.data.id;
+        let user = this.props.parent.state.user;
+        let field = this.props.parent.state.activeField;
+        let today = new Date();
+        let date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
+        let time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+        let dateTime = date+' '+time;
+        axios.get(`http://localhost:8000/notes/req/update_add_note/?id=${id}&user=${user}&field=${field}&date=${dateTime}&latitude=${lat}&longitude=${lng}&value=${''}`)
+        .then( res =>{
+          this.setState({pinsLoaded:false})
+          
+        })
       })
-    })
-  }
-  
-  _onDblClickMethod(e){
+    }
     console.log(e.target)
   }
   getLayer(){
@@ -87,11 +87,11 @@ export default class Map extends Component {
     return (layer);
   }
   getPins(){
-    if(this.props.parent.state.user!=''){
+    if(this.props.parent.state.user!==''){
       axios.get(`http://localhost:8000/notes/req/get_notes/?user=${this.props.parent.state.user}&field=${this.props.parent.state.activeField}`)
       .then(res =>{
         const info = res.data;
-        this.state.markers = info.notes;
+        this.setState({markers:info.notes});
         //console.log(this.state.markers)
       }
       )};

@@ -8,14 +8,31 @@
     border-style: solid;
     border-width: 2px;
     border-radius: 0.5rem;
+    transition-duration: 250ms;
+    position: absolute;
+    top:0;
 }
-.popup-hidden{
-    display: None
+.hidden{
+    background-color: transparent;
+    transition-duration: 250ms;
 }
-.vertical-form{
-    display: flex;
-    flex-direction: column;
+.visible{
+    display: initial;
+    transition-duration: 250ms;
 }
 .button-container{
     display: inline-block;
+}
+.pin-logo{
+    fill:red;
+    stroke: none;
+    transform: translate(-50%,-100%);
+}
+.hidden-form{
+    display: none;
+}
+.visible-form{
+    display: initial;
+    display: flex;
+    flex-direction: column;
 }
