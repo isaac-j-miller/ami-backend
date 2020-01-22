@@ -6,13 +6,6 @@ http://localhost:8000/overlays/req/request_overlay/?user=isaacmiller&field=Blenh
 (assuming locally hosting)
 to get an NDVI overlay, scale, and metadata for the user isaacmiller's field Blenheim on the date October 6, 2019.
 
-Requires Sqlite3 installed and the following Python packages:
-django
-rest_framework
-osgeo/gdal
-numpy
-matplotlib
-pillow
-glob
-shutil
-Metashape (must go to https://www.agisoft.com/downloads/installer/ to download the .whl)
+there are a few shell scripts to help with the setup. To localhost, I recommend copy-pasting the text from install-dependencies.sh to your machine and replacing the github username and email with your own or commenting out the github config if it is already set up. Then, you must run 'aws configure' in the terminal and set that up with your appropriate aws credentials.
+
+To start the local server, run start-local-hosting.sh 
