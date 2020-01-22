@@ -144,7 +144,8 @@ class UserViewSet(viewsets.ModelViewSet):
         sql_cursor = sql.cursor()
         resp = sql_cursor.execute('SELECT filepath FROM ami_api_stackedimage WHERE user=? AND field=?',[user, field])
         resp = resp.fetchone()[0]
-        box = get_tif_bbox(resp)
+        with S3GetHandler(resp,IMAGE_STORAGE) as s:
+            box = get_tif_bbox(s.tempname)
         lat = (box[1]+box[3])/2
         lon = (box[0]+box[2])/2
         print('field:',field,'response:', resp)
@@ -200,12 +201,46 @@ class OverlayImageViewSet(viewsets.ModelViewSet):
                     #if there is a stacked image that can be used, generate the requested index from that
                     imagefilepath = sql_sec_response[0][0]
                     demfilepath = sql_sec_response[0][1]
-                    stitch = ss(imagefilepath,demfilepath, output_directory=OVERLAY_STORAGE,output_base='test') #TODO: fix output_base
-                    stitch.generateIndex(req_data['index_name'])
-                    tif, scale = stitch.exportGeneratedIndicesAsColorImages()[0]
-                    png=imutils.convert(tif,tif.replace('.tif','.png'))
-                    bounds = get_tif_bbox(tif)
-                    data = {'available':1,'png':png, 'bounds':bounds,'scale':scale}
+                    with S3GetHandler(imagefilepath,IMAGE_STORAGE) as img, S3GetHandler(demfilepath,IMAGE_STORAGE) as dem:
+
+                        stitch = ss(img.tempname,
+                                    dem.tempname, 
+                                    output_directory=IMAGE_STORAGE,
+                                    output_base='temp')
+                        stitch.generateIndex(req_data['index_name'])
+                        tif, scale = stitch.exportGeneratedIndicesAsColorImages()[0]
+                        png=imutils.convert(tif,tif.replace('.tif','.png'))
+                        bounds = get_tif_bbox(tif)
+                        #TODO: clean up this with statement and eliminate redundancy
+                        with S3PutHandler(png) as png_s, S3PutHandler(scale) as scale_s, S3PutHandler(tif) as tif_s:
+                            png_extra, scale_extra, tif_extra = 0,0,0
+                            png_done, scale_done, tif_done = False, False, False
+                            while not png_done:
+                                png_key=generate_name_base(req_data['user'], req_data['field'], req_data['date'],req_data['index_name'],png_extra,'png')
+                                try:
+                                    png_s.upload(png_key)
+                                    png_key = png_s.get_url()
+                                    png_done = True
+                                except ValueError:
+                                    png_extra+=1
+                            while not scale_done:
+                                scale_key=generate_name_base(req_data['user'], req_data['field'], req_data['date'],req_data['index_name']+'_scale',png_extra,'png')
+                                try:
+                                    scale_s.upload(scale_key)
+                                    scale_key = scale_s.get_url()
+                                    scale_done = True
+                                except ValueError:
+                                    scale_extra+=1
+                            while not tif_done:
+                                tif_key=generate_name_base(req_data['user'], req_data['field'], req_data['date'],req_data['index_name'],tif_extra,'tif')
+                                try:
+                                    tif_s.upload(tif_key)
+                                    tif_key = tif_s.get_url()
+                                    tif_done = True
+                                except ValueError:
+                                    tif_extra+=1
+                        os.remove(png+'.aux.xml')
+                        data = {'available':1,'png':png_key, 'bounds':bounds,'scale':scale_key}
                     max_id=sql_cursor.execute('SELECT MAX(id) FROM ami_api_overlayimage')
                     #print(max_id)
                     max_id = [_ for _ in max_id][0]
@@ -214,7 +249,7 @@ class OverlayImageViewSet(viewsets.ModelViewSet):
                     max_id=(max_id[0] if max_id[0] else 0)+1
                     #print(max_id)
                     sql_cursor.execute('INSERT INTO ami_api_overlayimage (id, user, field, index_name, date, filepath, tiffilepath, scalefilepath) VALUES (?,?,?,?,?,?,?,?);',
-                                        [max_id, req_data['user'],req_data['field'], req_data['index_name'],req_data['date'],png, tif, scale])
+                                        [max_id, req_data['user'],req_data['field'], req_data['index_name'],req_data['date'],png_key, tif_key, scale_key])
                     sql.commit()
                     del sql
                 else:
@@ -223,7 +258,8 @@ class OverlayImageViewSet(viewsets.ModelViewSet):
             else:
                 #read filepaths from sql_init_response
                 png=sql_init_response[0][5]
-                bounds = get_tif_bbox(sql_init_response[0][7])
+                with S3GetHandler(sql_init_response[0][7],IMAGE_STORAGE) as tiff:
+                    bounds = get_tif_bbox(tiff.tempname)
                 scale=sql_init_response[0][6]
                 data = {'available':1,'png':png, 'bounds':bounds,'scale':scale}
         else:

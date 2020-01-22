@@ -14,6 +14,8 @@ class StitchSet():
     def __init__(self, ortho_file, dsm_file, band_order=ig.bandNames,
                  output_directory='.', output_base='', 
                  temperature_units='C', elevation_units='m', savi_L=0.5):
+        print('ortho_file:',ortho_file)
+        print('dsm_file:',dsm_file)
         self._ortho_file_name = ortho_file
         self._dsm_file_name = dsm_file
         self._output_directory = output_directory
