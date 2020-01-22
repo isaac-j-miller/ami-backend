@@ -4,6 +4,7 @@ import NavBar from './Components/NavBar'
 import SideBar from './Components/SideBar'
 import Login from './Components/Login'
 import Scale from './Components/Scale'
+//import Uploader from './Components/Uploader'
 import axios from 'axios'
 import styles from './Components/Style/AppStyle.css'
 
@@ -15,8 +16,10 @@ class App extends React.Component {
     this.sideBarRef = React.createRef();
     this.mapRef = React.createRef();
     this.scaleRef = React.createRef();
+    this.uploaderRef = React.createRef();
     this.getLoginClassName = this.getLoginClassName.bind(this);
     this.renderScale = this.renderScale.bind(this);
+    
   }
   state = {
       sideDrawerOpen: false,  
@@ -73,6 +76,10 @@ class App extends React.Component {
       return <div/>
     }
   }
+  renderUpload(){
+    //return <Uploader parent={this} id='uploader' ref={this.uploaderRef}></Uploader>
+    return <div/>
+  }
   render() {
    return (
      <div>
@@ -90,6 +97,9 @@ class App extends React.Component {
       </div>
       <div className='map-wrapper'>
         {this.renderMap()}
+      </div>
+      <div className='uploader-wrapper'>
+        {this.renderUpload()}
       </div>
      </div>
    )

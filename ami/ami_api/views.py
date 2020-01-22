@@ -176,6 +176,25 @@ class StackedImageViewSet(viewsets.ModelViewSet):
             
         else:
             return HttpResponse(status=400)
+    @action(methods=['get'], detail=True)
+    def request_upload(self,httprequest: HttpRequest, pk=None):
+        if httprequest.method == 'GET':
+            req_data = httprequest.GET.dict()
+            forms = {
+                'action': '{}{}'.format(genS3path(BUCKET), req_data['key']),
+                'method': 'POST',
+                'enctype': 'application/zip'
+            }
+            conditions = {
+
+            }
+            post = create_presigned_post(BUCKET, req_data['objectName'],forms, conditions)
+            if post is not None:
+                return JsonResponse(post)
+            else:
+                return HttpResponse(status=500)
+        else:
+            return HttpResponse(status=400)
 
 class OverlayImageViewSet(viewsets.ModelViewSet):
     queryset = OverlayImage.objects.all().order_by('user')
@@ -272,5 +291,4 @@ class OverlayImageViewSet(viewsets.ModelViewSet):
             return JsonResponse({'overlays':overlays})
         else:
             return HttpResponse(status=400)
-
 

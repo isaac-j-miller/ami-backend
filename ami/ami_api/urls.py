@@ -19,6 +19,7 @@ urlpatterns = [
     path('users/req/',views.UserViewSet.get_next_id,name='get next id'),
     path('users/req/', views.UserViewSet.add_user,name='add user'),
     path('stacks/req/',views.StackedImageViewSet.request_dates, name='request dates'),
+    path('stacks/req/',views.StackedImageViewSet.request_upload, name='request upload'),
     path('notes/req/',views.GeoNoteViewSet.get_next_id,name='get next id'),
     path('notes/req/',views.GeoNoteViewSet.update_add_note,name='update or add note'),
     path('notes/req/',views.GeoNoteViewSet.del_id,name='delete note by id')
