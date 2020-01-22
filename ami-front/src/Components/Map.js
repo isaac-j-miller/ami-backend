@@ -60,7 +60,7 @@ export default class Map extends Component {
     let lat = e.lngLat[1];
     let id;
     if(this.state.pinReady & this.state.displayPins){
-      axios.get('http://localhost:8000/notes/req/get_next_id')
+      axios.get('http://3.219.163.17:8000/notes/req/get_next_id')
       .then(res =>{
         id = res.data.id;
         let user = this.props.parent.state.user;
@@ -69,7 +69,7 @@ export default class Map extends Component {
         let date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
         let time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
         let dateTime = date+' '+time;
-        axios.get(`http://localhost:8000/notes/req/update_add_note/?id=${id}&user=${user}&field=${field}&date=${dateTime}&latitude=${lat}&longitude=${lng}&value=${''}`)
+        axios.get(`http://3.219.163.17:8000/notes/req/update_add_note/?id=${id}&user=${user}&field=${field}&date=${dateTime}&latitude=${lat}&longitude=${lng}&value=${''}`)
         .then( res =>{
           this.setState({pinsLoaded:false})
           
@@ -89,7 +89,7 @@ export default class Map extends Component {
   }
   getPins(){
     if(this.props.parent.state.user!==''){
-      axios.get(`http://localhost:8000/notes/req/get_notes/?user=${this.props.parent.state.user}&field=${this.props.parent.state.activeField}`)
+      axios.get(`http://3.219.163.17:8000/notes/req/get_notes/?user=${this.props.parent.state.user}&field=${this.props.parent.state.activeField}`)
       .then(res =>{
         const info = res.data;
         this.setState({markers:info.notes});

@@ -33,7 +33,7 @@ class App extends React.Component {
       origins: null
   } 
   componentDidMount(){
-    axios.get(`http://localhost:8000/overlays/req/possible_overlays/?`)
+    axios.get(`http://3.219.163.17:8000/overlays/req/possible_overlays/?`)
         .then(res =>{
             const info = res.data;
             this.setState({overlays:info.overlays});

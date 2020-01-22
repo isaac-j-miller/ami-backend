@@ -82,7 +82,7 @@ class SideBar extends Component{
         
     }
     getDates(){
-        axios.get(`http://localhost:8000/stacks/req/request_dates/?user=${this.state.user}&field=${this.state.activeField}`)
+        axios.get(`http://3.219.163.17:8000/stacks/req/request_dates/?user=${this.state.user}&field=${this.state.activeField}`)
         .then(res =>{
             const info = res.data;
             this.setState({dates:info.dates});
@@ -126,7 +126,7 @@ class SideBar extends Component{
         this.forceUpdate();
     }
     handleRequestOverlay(event){
-        axios.get(`http://localhost:8000/overlays/req/request_overlay/?user=${this.state.user}&field=${this.state.activeField}&date=${this.state.activeDate}&index_name=${this.state.activeOverlay}`)
+        axios.get(`http://3.219.163.17:8000/overlays/req/request_overlay/?user=${this.state.user}&field=${this.state.activeField}&date=${this.state.activeDate}&index_name=${this.state.activeOverlay}`)
         .then(res =>{
             const info = res.data;
             //TODO: extract necessary data and send it to the map
