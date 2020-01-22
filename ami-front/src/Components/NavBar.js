@@ -1,6 +1,6 @@
 import React, {Component} from 'react'
 import styles from '../Components/Style/NavBarStyle.css'
-
+import backend from '../globals'
 export default class NavBar extends Component{
     constructor(props){
         super(props);

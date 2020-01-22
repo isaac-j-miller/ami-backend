@@ -21,7 +21,7 @@ def convert(input_filename, output_filename, verbose=False, **kwargs):
     if not verbose:
         kwargs['q'] = ''
     kwargs_list = [item for key, value in kwargs.items() for item in ['-{}'.format(key), value] if value != '']
-    answer = subprocess.check_output(['gdal_translate.exe', *kwargs_list, input_filename, output_filename], shell=verbose)
+    answer = subprocess.check_output(['gdal_translate', *kwargs_list, input_filename, output_filename], shell=verbose)
     if verbose: 
         print(answer.decode('ANSI'))
     return output_filename

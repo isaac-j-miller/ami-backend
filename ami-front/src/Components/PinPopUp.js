@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import styles from './Style/PinStyle.css'
 import axios from 'axios';
+import backend from '../globals'
 export default class PinPopUp extends Component{
     constructor(props){
         super(props);
@@ -30,7 +31,7 @@ export default class PinPopUp extends Component{
     }
     handleSubmit(event){
         event.preventDefault();
-        axios.get(`http://3.219.163.17:8000/notes/req/update_add_note/?id=${this.props.parent.state.id}&user=${this.props.parent.state.user}&field=${this.props.parent.state.field}&date=${this.props.parent.state.date}&latitude=${this.props.parent.state.latitude}&longitude=${this.props.parent.state.longitude}&value=${this.props.parent.state.value}`)
+        axios.get(`${backend.value}/notes/req/update_add_note/?id=${this.props.parent.state.id}&user=${this.props.parent.state.user}&field=${this.props.parent.state.field}&date=${this.props.parent.state.date}&latitude=${this.props.parent.state.latitude}&longitude=${this.props.parent.state.longitude}&value=${this.props.parent.state.value}`)
         console.log('pin saved')
     }
     handleDateChange(event){
@@ -40,7 +41,7 @@ export default class PinPopUp extends Component{
         this.props.parent.setState({value: event.target.value});
     }
     handleDelete(){
-        axios.get(`http://3.219.163.17:8000/notes/req/del_id/?id=${this.props.parent.state.id}`)
+        axios.get(`${backend.value}/notes/req/del_id/?id=${this.props.parent.state.id}`)
         .then(this.props.grandparent.startPinTimer())
         .then(this.props.grandparent.setState({pinsLoaded:false}));
         

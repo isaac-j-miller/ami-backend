@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import axios from 'axios'
 import styles from '../Components/Style/LoginStyle.css'
+import backend from '../globals'
 class Login extends Component{
     constructor(props){
         super(props);
@@ -19,10 +20,10 @@ class Login extends Component{
         this.setState({password: event.target.value});
     }
     handleNewUser(){
-        axios.get(`http://3.219.163.17:8000/users/req/get_next_id/?`)
+        axios.get(`${backend.value}/users/req/get_next_id/?`)
         .then(res=>{
             const id = res.data.id;
-            axios.get(`http://3.219.163.17:8000/users/req/add_user/?id=${id}&user=${this.state.username}&password=${this.state.password}`)
+            axios.get(`${backend.value}/users/req/add_user/?id=${id}&user=${this.state.username}&password=${this.state.password}`)
         }).then(this.logIn({fields:[],origins:{}}));
     }
     logIn(info){
@@ -41,7 +42,7 @@ class Login extends Component{
         if(typeof event !== 'undefined'){
             event.preventDefault();
         }
-        axios.get(`http://3.219.163.17:8000/users/req/authenticate/?user=${this.state.username}&password=${this.state.password}`)
+        axios.get(`${backend.value}/users/req/authenticate/?user=${this.state.username}&password=${this.state.password}`)
         .then(res =>{
             const info = res.data;
             console.log(info);

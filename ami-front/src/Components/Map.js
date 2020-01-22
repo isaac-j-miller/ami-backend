@@ -3,7 +3,7 @@ import DeckGL, {BitmapLayer} from 'deck.gl';
 import ReactMapGL,{Marker} from 'react-map-gl'
 import Pin from './Pin'
 import axios from 'axios';
-
+import backend from '../globals'
 const TOKEN = 'pk.eyJ1IjoiaXNhYWNqbWlsbGVyIiwiYSI6ImNrMTZ6NnBqdjFiM3czcHRrb3ZtbTZsajYifQ.3tv9y_9KCHST0M5NaDj4Zg'; // Set your mapbox token here
 const mapStyle = {
     mapboxDefault:'mapbox://styles/isaacjmiller/ck5lue3zg14c21ilphvbyq25t',
@@ -60,7 +60,7 @@ export default class Map extends Component {
     let lat = e.lngLat[1];
     let id;
     if(this.state.pinReady & this.state.displayPins){
-      axios.get('http://3.219.163.17:8000/notes/req/get_next_id')
+      axios.get(`${backend.value}/notes/req/get_next_id`)
       .then(res =>{
         id = res.data.id;
         let user = this.props.parent.state.user;
@@ -69,7 +69,7 @@ export default class Map extends Component {
         let date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
         let time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
         let dateTime = date+' '+time;
-        axios.get(`http://3.219.163.17:8000/notes/req/update_add_note/?id=${id}&user=${user}&field=${field}&date=${dateTime}&latitude=${lat}&longitude=${lng}&value=${''}`)
+        axios.get(`${backend.value}/notes/req/update_add_note/?id=${id}&user=${user}&field=${field}&date=${dateTime}&latitude=${lat}&longitude=${lng}&value=${''}`)
         .then( res =>{
           this.setState({pinsLoaded:false})
           
@@ -89,7 +89,7 @@ export default class Map extends Component {
   }
   getPins(){
     if(this.props.parent.state.user!==''){
-      axios.get(`http://3.219.163.17:8000/notes/req/get_notes/?user=${this.props.parent.state.user}&field=${this.props.parent.state.activeField}`)
+      axios.get(`${backend.value}/notes/req/get_notes/?user=${this.props.parent.state.user}&field=${this.props.parent.state.activeField}`)
       .then(res =>{
         const info = res.data;
         this.setState({markers:info.notes});

@@ -5,7 +5,8 @@ LICENSE = 'TXC3V-LUVCT-E1BLK-U83UR-GP25H'  # 30-day temporary license. Will expi
 CALIB_CSV = 'ImageTools/RP04-1908203-SC.csv'  # Calibration data for Aerial Multispectral Imagery panel
 TEST_CALIB_CSV = 'ImageTools/RP04-1808099-SC.csv'  # Calibration data for example altum dataset
 PATH = 't_project'
-
+print('cwd:',os.getcwd())
+print('ls:',os.listdir(os.getcwd()))
 
 def stitch(main_dir, available_bands, basename, output_dir, license=LICENSE, temp_path=PATH,calib_csv=None):
     """

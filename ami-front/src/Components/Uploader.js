@@ -1,5 +1,6 @@
 import React, {Component} from 'react'
 var ReactS3Uploader = require('react-s3-uploader');
+import backend from '../globals'
 
 export default class Uploader extends Component{
     constructor(props){

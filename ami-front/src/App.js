@@ -7,7 +7,7 @@ import Scale from './Components/Scale'
 //import Uploader from './Components/Uploader'
 import axios from 'axios'
 import styles from './Components/Style/AppStyle.css'
-
+import backend from './globals'
 class App extends React.Component {
   constructor(props){
     super(props);
@@ -19,7 +19,6 @@ class App extends React.Component {
     this.uploaderRef = React.createRef();
     this.getLoginClassName = this.getLoginClassName.bind(this);
     this.renderScale = this.renderScale.bind(this);
-    
   }
   state = {
       sideDrawerOpen: false,  
@@ -33,7 +32,8 @@ class App extends React.Component {
       origins: null
   } 
   componentDidMount(){
-    axios.get(`http://3.219.163.17:8000/overlays/req/possible_overlays/?`)
+    console.log(backend)
+    axios.get(`${backend.value}/overlays/req/possible_overlays/?`)
         .then(res =>{
             const info = res.data;
             this.setState({overlays:info.overlays});
