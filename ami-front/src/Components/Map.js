@@ -26,6 +26,7 @@ export default class Map extends Component {
       pinsLoaded: false,
       markers: [],
       pinReady:true,
+      scaleUrl: null
     }
     this.deckRef=React.createRef();
     this._onClickMethod=this._onClickMethod.bind(this);
@@ -58,7 +59,7 @@ export default class Map extends Component {
     let lng = e.lngLat[0];
     let lat = e.lngLat[1];
     let id;
-    if(this.state.pinReady){
+    if(this.state.pinReady & this.state.displayPins){
       axios.get('http://localhost:8000/notes/req/get_next_id')
       .then(res =>{
         id = res.data.id;

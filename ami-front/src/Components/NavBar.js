@@ -13,7 +13,7 @@ export default class NavBar extends Component{
         return (
             <nav className='navbar'> 
                 <img onClick={this.handleToggleSideBar} className='icon' alt='menu button' src='https://cdn4.iconfinder.com/data/icons/wirecons-free-vector-icons/32/menu-alt-512.png'/>
-                <header className='navbar-header'>skyprecision.app</header>
+                <header className='navbar-header'>skyprecision.net</header>
             </nav>
         )
     }

@@ -1,27 +1,40 @@
 @import 'GeneralStyle.css';
 .sidebar-hidden{
-    transform: translateY(-100%);
-    
+    transform: translateY(-200%);
+    border-radius: 0.5rem;
+    margin-left: 1vw;
+    transition-duration: 0.5s;
+    transition-timing-function: linear;
+    display: flex;
+    flex-direction: column;
+    background: grey;
+    align-content: flex-start;
 }
 .sidebar-visible{
     display: flex;
     flex-direction: column;
     background: grey;
     align-content: flex-start;
-    max-width: 15vw;
-    transition-duration: 500ms;
-    background-color: rgba(255, 255, 255, 0.5);
+    transition-timing-function: linear;
+    transition-duration: 0.5s;
+    background-color: rgba(255, 255, 255, 0.75);
     height: auto;
+    border-radius: 0.5rem;
+    margin-left: 1vw;
 }
 .sidebar-button{
     margin: 0.5rem;
+    background-color: black;
+    transition-delay: 0;
+}
+.sidebar-button:hover{
+    margin: 0.5rem;
+    background-color: grey;
+    transition-delay: 0;
 }
 .subitem-visible{
-    transition-delay: 500ms;
-    display: initial;
 }
 .subitem-hidden{
-    display: none;
 }
 select{
     margin: 0.5rem;
@@ -30,4 +43,30 @@ select{
 label{
     margin: 0.5rem;
     margin-bottom: 0rem
+}
+.indexInfo-wrapper{
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+    max-width:25vw;
+    margin: 0.5rem;
+    border-color: black;
+    border-radius:0.5rem;
+    border-width: 1px;
+    border-style: double;
+}
+.sidebar-header{
+    text-align: center;
+    padding-left:1rem;
+    padding-right:1rem;
+    font-size: 1rem;
+    margin-bottom:0;
+    border-bottom: dashed 1px black;
+}
+.sidebar-p{
+    padding-left:1rem;
+    padding-right:1rem;
+}
+.indexInfo-wrapper.hidden{
+    display: none;
 }

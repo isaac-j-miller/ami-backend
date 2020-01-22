@@ -1,9 +1,19 @@
-button{
-    
+button,.input-button{
+    background-color: black;
+    color: white;
+    text-align: center;   
+    transition-duration: 0.3s;
+    border:0;
+    padding: 0.2rem;
+    border-radius: 0.25rem;
 }
-.input-button{
-
+button,.input-button:hover{
+    background-color: grey;
 }
-html{
+input{
+    width:auto;
+    word-wrap: break-word;
+}
+body{
     font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Verdana, sans-serif
 }

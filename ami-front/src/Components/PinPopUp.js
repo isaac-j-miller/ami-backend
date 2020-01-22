@@ -55,11 +55,11 @@ export default class PinPopUp extends Component{
                     </label>
                     <label>
                         Note:
-                        <input type='text' name="text" value={this.props.parent.state.value} onChange={this.handleTextChange}/>
+                        <textarea type='text' name="text" value={this.props.parent.state.value} onChange={this.handleTextChange}/>
                     </label>
                     <div className='button-container'> 
-                        <input type='submit' name="save" value="Save"/>
-                        <input type='button' name="delete" value="Delete" onClick={this.handleDelete}/>
+                        <input type='submit' name="save" value="Save" className='input-button'/>
+                        <input type='button' name="delete" value="Delete" className='input-button' onClick={this.handleDelete}/>
                     </div>
                     
                 </form>

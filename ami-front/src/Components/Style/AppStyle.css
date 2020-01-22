@@ -37,3 +37,9 @@
     height: 100%;
     width: 100%;
 }
+.scale-wrapper{
+    z-index:99;
+    position: fixed;
+    bottom:5%;
+    right: 5%;
+}

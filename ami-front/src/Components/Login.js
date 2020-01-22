@@ -72,8 +72,8 @@ class Login extends Component{
                     <input type="password" name = "password" value={this.state.password} onChange={this.handlePasswordChange}/>
                 </label>
                 <div>
-                    <input type="submit" name = "Log In" value="Log In"/>
-                    <input type="button" name = "Create New Account" value="Create New Account" onClick={this.handleNewUser}/>
+                    <input type="submit" name = "Log In" value="Log In" className='input-button'/>
+                    <input type="button" name = "Create New Account" value="Create New Account" onClick={this.handleNewUser} className='input-button'/>
                 </div>
             </form>
         </div>

@@ -14,6 +14,7 @@ class SideBar extends Component{
             datesArray: [], 
             overlaysArray: [], 
             activeOverlay:'',
+            indexInfoHidden:true,
             hidden:true
         }
         
@@ -24,6 +25,7 @@ class SideBar extends Component{
         this.handleRemoveOverlay = this.handleRemoveOverlay.bind(this);
         this.handleTogglePins=this.handleTogglePins.bind(this);
         this.setNewViewPort=this.setNewViewPort.bind(this);
+        this.getIndexInfoClass=this.getIndexInfoClass.bind(this);
         //this.getSubItemClass=this.getSubItemClass.bind(this);
         this.fieldsRef=React.createRef();
         this.datesRef=React.createRef();
@@ -55,7 +57,10 @@ class SideBar extends Component{
         }
     }
     handleTogglePins(){
-        this.props.parent.mapRef.current.setState({displayPins:!this.props.parent.mapRef.current.state.displayPins})
+        this.props.parent.mapRef.current.setState({displayPins:!this.props.parent.mapRef.current.state.displayPins});
+        if(!this.props.parent.mapRef.current.state.displayPins){
+            this.props.parent.mapRef.current.setState({pinsLoaded:false});
+        }
     }
     handleDateChange(event){
         this.props.parent.setState({activeDate:event.target.value});
@@ -67,6 +72,8 @@ class SideBar extends Component{
     }
     handleRemoveOverlay(event){
         this.props.parent.mapRef.current.setState({activeOverlay:null})
+        this.props.parent.scaleRef.current.setState({url:null});
+        this.setState({indexInfoHidden:true});
     }
     componentDidMount(){
         
@@ -126,10 +133,12 @@ class SideBar extends Component{
             if(info.available){
                 this.props.parent.mapRef.current.setState({activeOverlay:{
                     image: info.png,
-                    bounds: info.bounds
+                    bounds: info.bounds,
+                    scale: info.scale
                 }});
-                
+                this.props.parent.scaleRef.current.setState({url:info.scale});
                 this.props.parent.mapRef.current.forceUpdate();
+                this.setState({indexInfoHidden:false});
                 //console.log('forced update on map')
             }
 
@@ -153,6 +162,14 @@ class SideBar extends Component{
         }
         else{
             return 'subitem-visible';
+        }
+    }
+    getIndexInfoClass(){
+        if(this.state.indexInfoHidden){
+            return 'hidden'
+        }
+        else{
+            return ''
         }
     }
     render(){
@@ -185,6 +202,14 @@ class SideBar extends Component{
                 <button className={this.getSubItemClass()+' sidebar-button'} onClick={this.handleRequestOverlay}>Request Overlay</button>
                 <button className={this.getSubItemClass()+' sidebar-button'} onClick={this.handleRemoveOverlay}>Remove Overlay</button>
                 <button className={this.getSubItemClass()+' sidebar-button'} onClick={this.handleTogglePins}>Toggle Display Pins</button>
+                <div className={`indexInfo-wrapper ${this.getIndexInfoClass()}`}>
+                    <h1 className='sidebar-header'>
+                        Information about {this.state.activeOverlay.toUpperCase()}
+                    </h1>
+                    <p className='sidebar-p'>
+                        Lorem Ipsum blah blah blah about the index, will be replaced later with actual stuff
+                    </p>
+                </div>
             </div>
         )
     }

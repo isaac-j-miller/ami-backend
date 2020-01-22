@@ -24,7 +24,6 @@ export default class Pin extends Component{
             value:this.props.value,
             hidden:false
         }
-        this.size=20;
         this.popUpRef=React.createRef();
         this.onClick=this.onClick.bind(this)
     }
@@ -50,7 +49,7 @@ export default class Pin extends Component{
         return(
            
             <div>
-            <svg height={this.size} viewBox="0 0 24 24" className={`pin-logo ${this.getClass()}`} onClick = {this.onClick}>
+            <svg viewBox="0 0 24 24" className={`pin-logo ${this.getClass()}`} onClick = {this.onClick}>
                 <path d={ICON} />
             </svg>
                 <PinPopUp ref={this.popUpRef} {...this.state} parent={this} grandparent={this.props.parent}/>

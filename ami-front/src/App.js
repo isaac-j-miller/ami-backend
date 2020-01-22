@@ -3,6 +3,7 @@ import Map from './Components/Map'
 import NavBar from './Components/NavBar' 
 import SideBar from './Components/SideBar'
 import Login from './Components/Login'
+import Scale from './Components/Scale'
 import axios from 'axios'
 import styles from './Components/Style/AppStyle.css'
 
@@ -13,7 +14,9 @@ class App extends React.Component {
     this.toolBarRef = React.createRef();
     this.sideBarRef = React.createRef();
     this.mapRef = React.createRef();
+    this.scaleRef = React.createRef();
     this.getLoginClassName = this.getLoginClassName.bind(this);
+    this.renderScale = this.renderScale.bind(this);
   }
   state = {
       sideDrawerOpen: false,  
@@ -62,21 +65,32 @@ class App extends React.Component {
       return <div/>
     }
   }
+  renderScale(){
+    if(this.state.loggedIn){
+      return(<Scale parent={this} id='scale' ref={this.scaleRef}/>)
+    }
+    else{
+      return <div/>
+    }
+  }
   render() {
    return (
      <div>
-       <div className={this.getLoginClassName()}>
+      <div className={this.getLoginClassName()}>
         <Login parent={this} id='login' ref={this.loginRef}/>
-       </div>
-       <div className='nav-bar-wrapper'>
+      </div>
+      <div className='nav-bar-wrapper'>
         <NavBar parent={this} id='toolbar' ref={this.toolBarRef}/>
       </div>
       <div className='side-bar-wrapper'>
         <SideBar parent={this} id='sidebar' ref={this.sideBarRef}/>
-       </div>
-       <div className='map-wrapper'>
-       {this.renderMap()}
-       </div>
+      </div>
+      <div className='scale-wrapper'>
+        {this.renderScale()}
+      </div>
+      <div className='map-wrapper'>
+        {this.renderMap()}
+      </div>
      </div>
    )
   }
