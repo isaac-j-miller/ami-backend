@@ -6,6 +6,7 @@ sudo apt-get install python3-gdal
 sudo apt install gdal-bin
 sudo apt install python3-pip
 sudo apt install awscli
+sudo apt install xterm
 sudo apt-get install git-core git-gui git-doc
 curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -
 sudo apt install nodejs
