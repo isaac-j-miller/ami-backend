@@ -2,8 +2,9 @@
 cd ~/git_repo/ami-backend/ami-front/src
 echo $"export default {value:'http://127.0.0.1:8000'}" > 'globals.js'
 #turn debug mode on in django
+cd ~/git_repo/ami-backend/ami/ami
+sed -i 's/DEBUG\s?=\s?False/DEBUG = True/g' settings.py
 cd ~/git_repo/ami-backend/ami
-sed -i 's/"DEBUG_MODE\s?=\s?False"/"DEBUG_MODE = True"/g' > 'settings.py'
 xterm -title 'backend server' -e 'python3 manage.py runserver' &
 cd ~/git_repo/ami-backend/ami-front
 xterm -title 'frontend server' -e 'npm start' &
