@@ -27,7 +27,8 @@ DEBUG = True
 CORS_ORIGIN_ALLOW_ALL = False
 CORS_ORIGIN_WHITELIST=[ 
     'http://localhost:3000',
-    'http://3.219.163.17:3000'
+    'http://3.219.163.17:3000',
+    'http://app.skyprecision.net'
  ]
 ALLOWED_HOSTS = [
     '3.219.163.17',
