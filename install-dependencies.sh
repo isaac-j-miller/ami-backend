@@ -2,6 +2,7 @@
 #install external stuff
 sudo add-apt-repository ppa:ubuntugis/ppa
 sudo apt-get update
+sudo apt-get install unzip
 sudo apt-get install python3-gdal
 sudo apt install gdal-bin
 sudo apt install python3-pip

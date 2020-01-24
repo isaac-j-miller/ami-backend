@@ -7,7 +7,7 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background-image: url(https://images.unsplash.com/photo-1563514227147-6d2ff665a6a0?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60);
+    background-image: url(https://skyprecison.s3.amazonaws.com/res/skyprecision_background.jpg);
     background-repeat: no-repeat;
     background-size: cover;
     background-color: grey;
@@ -40,6 +40,6 @@
 .scale-wrapper{
     z-index:99;
     position: fixed;
-    bottom:5%;
-    right: 5%;
+    bottom:10vh;
+    right: 5vw;
 }

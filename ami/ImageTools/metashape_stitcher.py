@@ -99,7 +99,7 @@ def stitch(main_dir, available_bands, basename, output_dir, license=LICENSE, tem
     chunk.buildDem(source=Metashape.DenseCloudData, interpolation=Metashape.EnabledInterpolation)
     t = ig.elapsed('dsm constructed', t)
     print('exporting dsm...')
-    demname = os.path.join(output_dir, basename+'_dsm.tif')
+    demname = os.path.abspath(os.path.join(output_dir, basename+'_dsm.tif'))
     chunk.exportDem(demname,
                     format=Metashape.RasterFormatTiles,
                     image_format=Metashape.ImageFormatTIFF,
@@ -112,7 +112,7 @@ def stitch(main_dir, available_bands, basename, output_dir, license=LICENSE, tem
     t = ig.elapsed('orthomosaic construction', t)
     doc.save()
     print('exporting orthomosaic...')
-    orthoname = os.path.join(output_dir, basename+'_ortho.tif')
+    orthoname = os.path.abspath(os.path.join(output_dir, basename+'_ortho.tif'))
     chunk.exportOrthomosaic(orthoname,
                             format=Metashape.RasterFormatTiles,
                             image_format=Metashape.ImageFormatTIFF,

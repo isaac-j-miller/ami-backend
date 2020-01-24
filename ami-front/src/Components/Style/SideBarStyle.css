@@ -70,3 +70,6 @@ label{
 .indexInfo-wrapper.hidden{
     display: none;
 }
+.hidden-button{
+    display: none;
+}

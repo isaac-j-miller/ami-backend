@@ -21,3 +21,18 @@ class OverlayImageSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = OverlayImage
         fields = ('id','user','field','date','index_name','filepath', 'tiffilepath', 'scalefilepath')
+
+class RawImageSetSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = RawImageSet
+        fields = ('id','user','field','date','filepath')
+
+class IndexSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = Index
+        fields = ('name','summary')
+
+class FieldSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = Field
+        fields = ('id','name','user','latitude', 'longitude')

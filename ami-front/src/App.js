@@ -4,10 +4,11 @@ import NavBar from './Components/NavBar'
 import SideBar from './Components/SideBar'
 import Login from './Components/Login'
 import Scale from './Components/Scale'
-//import Uploader from './Components/Uploader'
+import Uploader from './Components/Uploader'
 import axios from 'axios'
 import styles from './Components/Style/AppStyle.css'
 import backend from './globals'
+import { object } from 'prop-types';
 class App extends React.Component {
   constructor(props){
     super(props);
@@ -21,7 +22,6 @@ class App extends React.Component {
     this.renderScale = this.renderScale.bind(this);
   }
   state = {
-      sideDrawerOpen: false,  
       user: '',
       fields: [],
       activeField:'',
@@ -33,13 +33,15 @@ class App extends React.Component {
   } 
   componentDidMount(){
     console.log(backend)
-    axios.get(`${backend.value}/overlays/req/possible_overlays/?`)
+    axios.get(`${backend.value}/indices/req/request_indices/?`)
         .then(res =>{
             const info = res.data;
-            this.setState({overlays:info.overlays});
+            this.setState({overlays:Object.keys(info)});
             //console.log('overlaysrequest:')
-            //console.log(info);
-            this.sideBarRef.current.setState({overlays:info.overlays});
+            console.log(info);
+            this.sideBarRef.current.setState({overlays:Object.keys(info)});
+            this.sideBarRef.current.setState({overlayInfo:info});
+            this.sideBarRef.current.setState({activeOverlay:Object.keys(info)[0]});
             this.sideBarRef.current.getOverlays();
         })
         .catch(function(error){
@@ -77,8 +79,8 @@ class App extends React.Component {
     }
   }
   renderUpload(){
-    //return <Uploader parent={this} id='uploader' ref={this.uploaderRef}></Uploader>
-    return <div/>
+    return <Uploader parent={this} id='uploader' ref={this.uploaderRef}></Uploader>
+    //return <div/>
   }
   render() {
    return (

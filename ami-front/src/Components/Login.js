@@ -45,7 +45,7 @@ class Login extends Component{
         axios.get(`${backend.value}/users/req/authenticate/?user=${this.state.username}&password=${this.state.password}`)
         .then(res =>{
             const info = res.data;
-            console.log(info);
+            //console.log(info);
             if(info.correct){
                 this.logIn(info);
             }

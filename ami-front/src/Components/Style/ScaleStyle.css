@@ -5,4 +5,11 @@
     border-color: black;
     border-width: 2px;
     border-radius: 0.25rem;
+    transition-duration: 500ms;
+}
+.hidden-color-scale{
+    display: none;
+}
+.color-scale:hover{
+    height:80vh;
 }

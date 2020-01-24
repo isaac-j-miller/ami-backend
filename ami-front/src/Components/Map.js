@@ -92,7 +92,20 @@ export default class Map extends Component {
       axios.get(`${backend.value}/notes/req/get_notes/?user=${this.props.parent.state.user}&field=${this.props.parent.state.activeField}`)
       .then(res =>{
         const info = res.data;
-        this.setState({markers:info.notes});
+        let notes = [];
+        let currentMarkers = this.state.markers;
+
+        info.notes.forEach(function(marker){
+          notes.push(marker);
+          let hidden=true
+          for(let i = 0; i<currentMarkers.length; i++){
+            if(currentMarkers[i].id==marker.id){
+              hidden=currentMarkers[i].hidden;
+            }
+          }
+          notes[notes.length-1].hidden=hidden;
+        })
+        this.setState({markers:notes});
         //console.log(this.state.markers)
       }
       )};

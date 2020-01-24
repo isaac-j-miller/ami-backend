@@ -4,13 +4,16 @@ from django.views.decorators.csrf import csrf_exempt
 from rest_framework.parsers import JSONParser
 from rest_framework.decorators import action
 from .customutils import *
-# Create your views here.
 from rest_framework import viewsets, request
 import ImageTools.index_generator as ig
 from ImageTools.stitchSet import StitchSet as ss
 import ImageTools.utils as imutils
+from ImageTools.metashape_stitcher import stitch as stitch
 from .serializers import *
 from .models import *
+import zipfile
+import glob
+import platform
 
 class GeoNoteViewSet(viewsets.ModelViewSet):
     queryset = GeoNote.objects.all().order_by('user')
@@ -31,6 +34,7 @@ class GeoNoteViewSet(viewsets.ModelViewSet):
             keys = ['id','user','field','value','latitude','date','longitude']
             response = [{key:value for key, value in zip(keys, marker)} for marker in resp]
             print(resp)
+            
             return JsonResponse({'notes':response})
         else:
             return HttpResponse(status=400)
@@ -42,6 +46,7 @@ class GeoNoteViewSet(viewsets.ModelViewSet):
             max_id=sql_cursor.execute('SELECT MAX(id) FROM ami_api_geonote')
             
             max_id=sql_cursor.fetchone()[0]
+            
             if max_id is not None:
                 return JsonResponse({'id':max_id+1})
             else:
@@ -54,6 +59,7 @@ class GeoNoteViewSet(viewsets.ModelViewSet):
             req_data = httprequest.GET.dict()
             sql_cursor.execute('DELETE from ami_api_geonote WHERE id=?',[req_data['id']])
             sql.commit()
+            
             return HttpResponse(status=200)
         else:
             return HttpResponse(status=400)
@@ -74,16 +80,17 @@ class GeoNoteViewSet(viewsets.ModelViewSet):
                 sql_cursor.execute('UPDATE ami_api_geonote SET date=?, value=? WHERE id=?',
                 [req_data['date'], req_data['value'], req_data['id']])
                 sql.commit()
+                
                 return HttpResponse(status=200)
             else:
                 print('inserting')
                 sql_cursor.execute('INSERT INTO ami_api_geonote (id, user, field, date, latitude, longitude, value) VALUES (?,?,?,?,?,?,?)',
                     [req_data['id'],req_data['user'],req_data['field'],req_data['date'],req_data['latitude'],req_data['longitude'],req_data['value']])
                 sql.commit()
+                
                 return HttpResponse(status=200)
         else:
             return HttpResponse(status=400)
-
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -108,6 +115,7 @@ class UserViewSet(viewsets.ModelViewSet):
                 else:
                     origins = {f:self.get_field_location(req_data['user'], f) for f in fields}
                 print('origins:',origins)
+                
                 return JsonResponse({'correct':1,'fields':fields, 'origins':origins})
             except IndexError:
                 return JsonResponse({'correct':0,'fields':[], 'origins': {}})
@@ -123,6 +131,7 @@ class UserViewSet(viewsets.ModelViewSet):
         if httprequest.method == 'GET':
             max_id=sql_cursor.execute('SELECT MAX(id) FROM ami_api_user')
             max_id=sql_cursor.fetchone()[0]+1
+            
             return JsonResponse({'id':max_id})
         else:
             return HttpResponse(status=400)
@@ -135,6 +144,7 @@ class UserViewSet(viewsets.ModelViewSet):
             req_data = httprequest.GET.dict()
             sql_cursor.execute('INSERT INTO ami_api_user (id,user,password,fields) VALUES (?,?,?,?)',[req_data['id'],req_data['user'],req_data['password'],''])
             sql.commit()
+            
             return HttpResponse(status=200)
         else:
             return HttpResponse(status=400)
@@ -142,14 +152,10 @@ class UserViewSet(viewsets.ModelViewSet):
     def get_field_location(self,user, field):
         sql = sqlite3.connect('./db.sqlite3')
         sql_cursor = sql.cursor()
-        resp = sql_cursor.execute('SELECT filepath FROM ami_api_stackedimage WHERE user=? AND field=?',[user, field])
-        resp = resp.fetchone()[0]
-        with S3GetHandler(resp,IMAGE_STORAGE) as s:
-            box = get_tif_bbox(s.tempname)
-        lat = (box[1]+box[3])/2
-        lon = (box[0]+box[2])/2
-        print('field:',field,'response:', resp)
-        return {'latitude':lat,'longitude':lon}
+        
+        resp =sql_cursor.execute('SELECT latitude, longitude FROM ami_api_field WHERE user=? AND name=?',[user,field]).fetchone()
+        return {'latitude':resp[0],'longitude':resp[1]}
+        
 
 
 class StackedImageViewSet(viewsets.ModelViewSet):
@@ -168,31 +174,12 @@ class StackedImageViewSet(viewsets.ModelViewSet):
             #print(command)
             resp=sql_cursor.execute(command)
             try:
-                resp=[_ for _ in resp][0]
+                resp=[_ for _ in resp]
                 #print(resp)
                 return JsonResponse({'dates':resp})
             except IndexError:
                 return JsonResponse({'dates':[]})
-            
-        else:
-            return HttpResponse(status=400)
-    @action(methods=['get'], detail=True)
-    def request_upload(self,httprequest: HttpRequest, pk=None):
-        if httprequest.method == 'GET':
-            req_data = httprequest.GET.dict()
-            forms = {
-                'action': '{}{}'.format(genS3path(BUCKET), req_data['key']),
-                'method': 'POST',
-                'enctype': 'application/zip'
-            }
-            conditions = {
 
-            }
-            post = create_presigned_post(BUCKET, req_data['objectName'],forms, conditions)
-            if post is not None:
-                return JsonResponse(post)
-            else:
-                return HttpResponse(status=500)
         else:
             return HttpResponse(status=400)
 
@@ -207,7 +194,7 @@ class OverlayImageViewSet(viewsets.ModelViewSet):
             req_data = httprequest.GET.dict()
             #print(req_data)
             resp = sql_cursor.execute('SELECT * FROM ami_api_overlayimage WHERE user=? AND field=? AND date=? AND index_name=?;',
-                                        [req_data['user'],req_data['field'],req_data['date'],req_data['index_name']])
+                                        [req_data['user'],req_data['field'],req_data['date'],req_data['index_name'].lower()])
             sql_init_response = [_ for _ in resp]
             #print(sql_init_response)
             if not sql_init_response:
@@ -226,39 +213,28 @@ class OverlayImageViewSet(viewsets.ModelViewSet):
                                     dem.tempname, 
                                     output_directory=IMAGE_STORAGE,
                                     output_base='temp')
-                        stitch.generateIndex(req_data['index_name'])
-                        tif, scale = stitch.exportGeneratedIndicesAsColorImages()[0]
-                        png=imutils.convert(tif,tif.replace('.tif','.png'))
-                        bounds = get_tif_bbox(tif)
-                        #TODO: clean up this with statement and eliminate redundancy
-                        with S3PutHandler(png) as png_s, S3PutHandler(scale) as scale_s, S3PutHandler(tif) as tif_s:
-                            png_extra, scale_extra, tif_extra = 0,0,0
-                            png_done, scale_done, tif_done = False, False, False
-                            while not png_done:
-                                png_key=generate_name_base(req_data['user'], req_data['field'], req_data['date'],req_data['index_name'],png_extra,'png')
-                                try:
-                                    png_s.upload(png_key)
-                                    png_key = png_s.get_url()
-                                    png_done = True
-                                except ValueError:
-                                    png_extra+=1
-                            while not scale_done:
-                                scale_key=generate_name_base(req_data['user'], req_data['field'], req_data['date'],req_data['index_name']+'_scale',png_extra,'png')
-                                try:
-                                    scale_s.upload(scale_key)
-                                    scale_key = scale_s.get_url()
-                                    scale_done = True
-                                except ValueError:
-                                    scale_extra+=1
-                            while not tif_done:
-                                tif_key=generate_name_base(req_data['user'], req_data['field'], req_data['date'],req_data['index_name'],tif_extra,'tif')
-                                try:
-                                    tif_s.upload(tif_key)
-                                    tif_key = tif_s.get_url()
-                                    tif_done = True
-                                except ValueError:
-                                    tif_extra+=1
-                        os.remove(png+'.aux.xml')
+                        if req_data['index_name'].lower()=='rgb':
+                            tif = stitch.exportRGBAImage()
+                            png=imutils.convert(tif,tif.replace('.tif','.png'))
+                            bounds = get_tif_bbox(tif)
+                            scale_key='na'
+                            with S3PutHandler(png) as png_s, S3PutHandler(tif) as tif_s:
+                                png_key=png_s.proper_upload(req_data['user'], req_data['field'], req_data['date'],req_data['index_name'].lower(),0,'png')
+                                tif_key=tif_s.proper_upload(req_data['user'], req_data['field'], req_data['date'],req_data['index_name'].lower(),0,'tif')
+                        else:
+                            stitch.generateIndex(req_data['index_name'].lower())
+                            tif, scale = stitch.exportGeneratedIndicesAsColorImages()[0]
+                            png=imutils.convert(tif,tif.replace('.tif','.png'))
+                            bounds = get_tif_bbox(tif)
+                            with S3PutHandler(png) as png_s, S3PutHandler(scale) as scale_s, S3PutHandler(tif) as tif_s:
+                                png_key=png_s.proper_upload(req_data['user'], req_data['field'], req_data['date'],req_data['index_name'].lower(),0,'png')
+                                tif_key=tif_s.proper_upload(req_data['user'], req_data['field'], req_data['date'],req_data['index_name'].lower(),0,'tif')
+                                scale_key=scale_s.proper_upload(req_data['user'], req_data['field'], req_data['date'],req_data['index_name'].lower()+'_scale',0,'png')
+                        try:
+                            os.remove(png+'.aux.xml')
+                        except Exception as e:
+                            print(e)
+                        
                         data = {'available':1,'png':png_key, 'bounds':bounds,'scale':scale_key}
                     max_id=sql_cursor.execute('SELECT MAX(id) FROM ami_api_overlayimage')
                     #print(max_id)
@@ -268,9 +244,9 @@ class OverlayImageViewSet(viewsets.ModelViewSet):
                     max_id=(max_id[0] if max_id[0] else 0)+1
                     #print(max_id)
                     sql_cursor.execute('INSERT INTO ami_api_overlayimage (id, user, field, index_name, date, filepath, tiffilepath, scalefilepath) VALUES (?,?,?,?,?,?,?,?);',
-                                        [max_id, req_data['user'],req_data['field'], req_data['index_name'],req_data['date'],png_key, tif_key, scale_key])
+                                        [max_id, req_data['user'],req_data['field'], req_data['index_name'].lower(),req_data['date'],png_key, tif_key, scale_key])
                     sql.commit()
-                    del sql
+                    
                 else:
                     #there is no available data and the default response will send
                     return HttpResponse(status=404)
@@ -292,3 +268,125 @@ class OverlayImageViewSet(viewsets.ModelViewSet):
         else:
             return HttpResponse(status=400)
 
+
+class RawImageSetViewSet(viewsets.ModelViewSet):
+    queryset = RawImageSet.objects.all().order_by('date')
+    serializer_class = RawImageSetSerializer
+    @action(methods=['get'], detail=True)
+    def process(self,httprequest: HttpRequest, pk=None):
+        if httprequest.method == 'GET':
+            print('process request received')
+            req_data = httprequest.GET.dict()
+            print(req_data)
+            
+            with S3GetHandler(req_data['url'],IMAGE_STORAGE) as zipped:
+                print('downloaded zip')
+                
+                files=os.listdir(IMAGE_STORAGE)
+                done = False
+                while not done:
+                    fname=''.join(random.choices(LETTERS,k=10))
+                    done = fname not in os.listdir(IMAGE_STORAGE)
+                folder=os.path.join(IMAGE_STORAGE,fname)
+                system = platform.system()
+                os.mkdir(folder)
+                print('unzipping')
+                if system =='Windows':
+                    print(subprocess.check_output(['tar','-zxvf','"'+zipped.tempname+'"','-C','"'+folder+'"']))
+                elif system == 'Linux':
+                    print(subprocess.check_output(['unzip','"'+zipped.tempname+'"','-d','"'+folder+'"']))
+                else:
+                    print('unsupported os')
+                
+                subs=glob.glob(os.path.join(folder,'****SET'))
+                if not subs:
+                    subs = [folder]
+                else:
+                    subs = [os.path.join(folder, sub) for sub in subs]
+                print('stitchsets:',subs)
+                orthos=[]
+                dsms=[]
+                print(len(subs), 'image sets detected')
+                for sub in subs:
+                #the file has now been extracted to directory
+                #update bands so that this works with non-altum also
+                    names = stitch(sub,req_data['bands'].split(','),'temp',IMAGE_STORAGE)
+                    dsms.append(names[0])
+                    orthoSize = os.path.getsize(names[1])
+                    maxSize=40e6 # 40 MB
+                    if orthoSize>maxSize:
+                        orthos.append(ig.resize_tif(names[1],IMAGE_STORAGE,'temp_ortho_resized.tif',(maxSize/orthoSize)**.5))
+                    print(names)
+                if len(subs)>1:
+                    outortho=os.path.join(IMAGE_STORAGE,'merged_ortho.tif')
+                    outdsm=os.path.join(IMAGE_STORAGE,'merged_dsm.tif')
+                    print('merging sets')
+                    subprocess.check_output(['gdal_merge.py','-o', outortho,'-of','GTiff', ' '.join(orthos)])
+                    subprocess.check_output(['gdal_merge.py','-o', outdsm,'-of','GTiff', ' '.join(dsms)])
+                    ortho, dsm = outortho, outdsm
+                else:
+                    ortho, dsm = orthos[0], dsms[0]
+
+                with S3PutHandler(dsm) as dsm_s, S3PutHandler(ortho) as ortho_s:
+                    print('handler entered')
+                    dsm_key=dsm_s.proper_upload(req_data['user'], req_data['field'], req_data['date'],'dsm',0,'tif')
+                    ortho_key=ortho_s.proper_upload(req_data['user'], req_data['field'], req_data['date'],'ortho',0,'tif')
+                    print('keys generated, ortho:',ortho_key,'dsm:',dsm_key)
+                    sql = sqlite3.connect('./db.sqlite3')
+                    sql_cursor = sql.cursor()
+                    max_id=sql_cursor.execute('SELECT MAX(id) FROM ami_api_stackedimage')
+                    #TODO: include error handling in case there are zero entries in the table
+                    max_id = [_ for _ in max_id][0]
+                    max_id=(max_id[0] if max_id[0] else 0)+1
+                    sql_cursor.execute('INSERT INTO ami_api_stackedimage (id, user, field, date, filepath, demfilepath) VALUES (?,?,?,?,?,?)',[
+                        max_id, req_data['user'], req_data['field'], req_data['date'], ortho_key, dsm_key
+                    ])
+                    sql.commit()
+                    box = get_tif_bbox(dsm)
+                    lat = (box[1]+box[3])/2
+                    lon = (box[0]+box[2])/2
+                    max_id=sql_cursor.execute('SELECT MAX(id) FROM ami_api_field')
+                    #TODO: include error handling in case there are zero entries in the table
+                    max_id = [_ for _ in max_id][0]
+                    max_id=(max_id[0] if max_id[0] else 0)+1
+                    sql_cursor.execute('INSERT INTO ami_api_field (id, name, user, latitude, longitude) VALUES (?,?,?,?,?)',[
+                        max_id, req_data['field'],req_data['user'],lat, lon
+                    ]
+                    )
+                #TODO: delete the zip file from the s3 bucket after processing.
+                #TODO: clean up temporary files
+                
+
+            return HttpResponse(status=200)
+        else:
+            return HttpResponse(status=400)
+
+
+class IndexViewSet(viewsets.ModelViewSet):
+    queryset = Index.objects.all().order_by('name')
+    serializer_class = IndexSerializer
+    @action(methods=['get'], detail=True)
+    def request_indices(self,httprequest: HttpRequest, pk=None):
+        sql = sqlite3.connect('./db.sqlite3')
+        sql_cursor = sql.cursor()
+        if httprequest.method == 'GET':
+            resp =sql_cursor.execute('SELECT * FROM ami_api_index')
+            
+            return JsonResponse({index:{'long':long_name,'summary':summary} for index,long_name,summary in resp})
+        else:
+            return HttpResponse(status=400)
+
+class FieldViewSet(viewsets.ModelViewSet):
+    queryset = Field.objects.all().order_by('name')
+    serializer_class = FieldSerializer
+    @action(methods=['get'], detail=True)
+    def get_location(self,httprequest: HttpRequest, pk=None):
+        sql = sqlite3.connect('./db.sqlite3')
+        sql_cursor = sql.cursor()
+        if httprequest.method == 'GET':
+            req_data = httprequest.GET.dict()  
+            resp =sql_cursor.execute('SELECT (latitude, longitude) FROM ami_api_field WHERE user="?" AND name = "?"',[req_data['user'],req_data['name']]).fetchone()
+            
+            return JsonResponse({'latitude':resp[0],'longitude':resp[1]})
+        else:
+            return HttpResponse(status=400) 

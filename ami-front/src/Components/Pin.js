@@ -22,7 +22,7 @@ export default class Pin extends Component{
             latitude:this.props.latitude,
             longitude:this.props.longitude,
             value:this.props.value,
-            hidden:false
+            hidden:this.props.hidden
         }
         this.popUpRef=React.createRef();
         this.onClick=this.onClick.bind(this)
@@ -33,6 +33,17 @@ export default class Pin extends Component{
     onClick(){
         console.log('marker has been clicked');
         this.popUpRef.current.setState({visible: !this.popUpRef.current.state.visible});
+        let index = 0;
+        console.log(this.props.parent.state.markers)
+        for (let i = 0; i<this.props.parent.state.markers.length; i++){
+            if(this.props.parent.state.markers[i].id==this.props.id){
+                index = i;
+                console.log(i)
+                
+                break;
+            }
+        }
+        this.props.parent.state.markers[index].hidden = !this.props.parent.state.markers[index].hidden;
     }
     componentDidMount(){
         console.log('marker has mounted')
