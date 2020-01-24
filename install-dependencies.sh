@@ -13,6 +13,8 @@ curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -
 sudo apt install nodejs
 npm install react
 npm install react-scripts
+npm install aws-sdk
+npm install react-dropzone
 #install python libs
 pip3 install matplotlib
 pip3 install wheel
