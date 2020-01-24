@@ -11,7 +11,7 @@ export default class PinPopUp extends Component{
         this.handleDelete=this.handleDelete.bind(this);
         this.onClose=this.onClose.bind(this);
         this.state = {
-            visible: (!this.props.parent.state.hidden | this.props.parent.state.value=='')
+            visible: (!this.props.parent.state.hidden | this.props.parent.state.value==='')
         }
     }
     getClass(){
@@ -39,7 +39,7 @@ export default class PinPopUp extends Component{
         this.props.parent.setState({date: event.target.value});
         let index = 0;
         for (let i = 0; i<this.props.grandparent.state.markers.length; i++){
-            if(this.props.grandparent.state.markers[i].id==this.props.parent.props.id){
+            if(this.props.grandparent.state.markers[i].id===this.props.parent.props.id){
                 index = i;
                 break;
             }
@@ -50,7 +50,7 @@ export default class PinPopUp extends Component{
         this.props.parent.setState({value: event.target.value});
         let index = 0;
         for (let i = 0; i<this.props.grandparent.state.markers.length; i++){
-            if(this.props.grandparent.state.markers[i].id==this.props.parent.props.id){
+            if(this.props.grandparent.state.markers[i].id===this.props.parent.props.id){
                 index = i;
                 break;
             }

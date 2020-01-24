@@ -8,7 +8,8 @@ import Uploader from './Components/Uploader'
 import axios from 'axios'
 import styles from './Components/Style/AppStyle.css'
 import backend from './globals'
-import { object } from 'prop-types';
+
+
 class App extends React.Component {
   constructor(props){
     super(props);

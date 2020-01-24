@@ -10,7 +10,7 @@ export default class Scale extends Component{
     }
     componentDidMount(){
         if(this.props.parent.mapRef.current!==null){
-            if(this.props.parrent.sideBarRef.state.activeOverlay!='RGB'){
+            if(this.props.parrent.sideBarRef.state.activeOverlay!=='RGB'){
                 this.setState({url:this.props.parent.mapRef.current.state.activeOverlay.scale});
             }
         }

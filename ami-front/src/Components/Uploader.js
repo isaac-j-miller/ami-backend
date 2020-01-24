@@ -53,7 +53,7 @@ export default class Uploader extends Component{
     }
     onSubmit(event){
         event.preventDefault();
-        if (this.state.date=="" | this.state.field=="" | !this.state.selectedFile[0] | !this.state.selectedFile[0].name.endsWith('.zip')){
+        if (this.state.date==="" | this.state.field==="" | !this.state.selectedFile[0] | !this.state.selectedFile[0].name.endsWith('.zip')){
             return
         }
         AWS.config.update({

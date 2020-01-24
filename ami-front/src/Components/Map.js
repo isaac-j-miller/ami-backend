@@ -99,7 +99,7 @@ export default class Map extends Component {
           notes.push(marker);
           let hidden=true
           for(let i = 0; i<currentMarkers.length; i++){
-            if(currentMarkers[i].id==marker.id){
+            if(currentMarkers[i].id===marker.id){
               hidden=currentMarkers[i].hidden;
             }
           }

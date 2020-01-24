@@ -165,7 +165,7 @@ class SideBar extends Component{
                 this.setState({reqOverlayClass:'hidden-button '})
                 this.setState({remOverlayClass:''})
                 
-                this.props.parent.scaleRef.current.setState({visible:!(this.state.activeOverlay=='RGB')});
+                this.props.parent.scaleRef.current.setState({visible:!(this.state.activeOverlay==='RGB')});
             
             }
 
