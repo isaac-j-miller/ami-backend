@@ -13,7 +13,7 @@ import ImageTools.index_generator as ig
 class StitchSet():
     def __init__(self, ortho_file, dsm_file, band_order=ig.bandNames,
                  output_directory='.', output_base='', 
-                 temperature_units='C', elevation_units='m', savi_L=0.5):
+                 temperature_units='F', elevation_units='ft', savi_L=0.5):
         print('ortho_file:',ortho_file)
         print('dsm_file:',dsm_file)
         self._ortho_file_name = ortho_file
@@ -108,7 +108,7 @@ class StitchSet():
         fig, ax = plt.subplots(figsize=(1, 6), constrained_layout=True)
         norm = colors.Normalize(vmin=minimum, vmax=maximum)
         color_bar = cbar.ColorbarBase(ax, colormap, norm)
-        color_bar.set_label(label=label, rotation=90)
+        #color_bar.set_label(label=label, rotation=90)
         fig.savefig(filepath)
         fig, ax = None, None
         plt.ion()
@@ -132,7 +132,10 @@ class StitchSet():
         scale_path = os.path.join(self._output_directory, '{}_{}_scale.png'.format(self._output_base,index))
         
         self.saveColorGeoTiff(colormapped_data, tif_path)
-        self.saveColorKey(color_map, label_name, min_value, max_value, scale_path)
+        if index.lower() in ['thermal','rgb', 'dsm']:
+            self.saveColorKey(color_map, label_name, min_value, max_value, scale_path)
+        else:
+            scale_path=None
         return [tif_path, scale_path]
     
     def exportMonoImage(self, index):

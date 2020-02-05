@@ -8,6 +8,7 @@
     border-radius: 0.5rem;
     transition-duration: 250ms;
     position: absolute;
+    z-index:120;
     top:0;
 }
 .hidden{
@@ -28,6 +29,7 @@
     stroke: none;
     height:20px;
     transform: translate(-50%,-100%);
+    z-index: 100;
 }
 .hidden-form{
     display: none;

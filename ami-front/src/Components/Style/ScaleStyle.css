@@ -7,9 +7,30 @@
     border-radius: 0.25rem;
     transition-duration: 500ms;
 }
+.color-scale-div{
+    border-color: black;
+    border-width: 2px;
+    border-radius: 0.25rem;
+    transition-duration: 500ms;
+    background-color: white;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+.hidden-color-scale-div{
+    display:none;
+}
 .hidden-color-scale{
     display: none;
 }
-.color-scale:hover{
+.color-scale-div:hover > .color-scale{
     height:80vh;
+}
+
+.scale-title{
+    writing-mode: vertical-rl;
+    font-size: 1rem;
+    margin: 0;
+    padding-right:0;
+    
 }

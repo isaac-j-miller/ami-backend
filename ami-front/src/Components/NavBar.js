@@ -8,6 +8,12 @@ export default class NavBar extends Component{
     }
     handleToggleSideBar(){
         this.props.parent.sideBarRef.current.setState({hidden:!this.props.parent.sideBarRef.current.state.hidden})
+        if(this.props.parent.state.sidebarClass==='hidden'){
+            this.props.parent.setState({sidebarClass:'visible'});
+        }
+        else{
+            this.props.parent.setState({sidebarClass:'hidden'});
+        }
     }
     render(){
         return (

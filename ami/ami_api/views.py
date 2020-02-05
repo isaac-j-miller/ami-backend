@@ -226,10 +226,14 @@ class OverlayImageViewSet(viewsets.ModelViewSet):
                             tif, scale = stitch.exportGeneratedIndicesAsColorImages()[0]
                             png=imutils.convert(tif,tif.replace('.tif','.png'))
                             bounds = get_tif_bbox(tif)
-                            with S3PutHandler(png) as png_s, S3PutHandler(scale) as scale_s, S3PutHandler(tif) as tif_s:
+                            with S3PutHandler(png) as png_s, S3PutHandler(tif) as tif_s:
                                 png_key=png_s.proper_upload(req_data['user'], req_data['field'], req_data['date'],req_data['index_name'].lower(),0,'png')
                                 tif_key=tif_s.proper_upload(req_data['user'], req_data['field'], req_data['date'],req_data['index_name'].lower(),0,'tif')
-                                scale_key=scale_s.proper_upload(req_data['user'], req_data['field'], req_data['date'],req_data['index_name'].lower()+'_scale',0,'png')
+                            if scale is not None:
+                                with S3PutHandler(scale) as scale_s:
+                                    scale_key=scale_s.proper_upload(req_data['user'], req_data['field'], req_data['date'],req_data['index_name'].lower()+'_scale',0,'png')
+                            else:
+                                scale_key=genS3path(BUCKET)+'scale.png'
                         try:
                             os.remove(png+'.aux.xml')
                         except Exception as e:

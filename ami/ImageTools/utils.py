@@ -1,5 +1,6 @@
 import gdal, rasterio
 import subprocess
+import numpy as np
 
 def convert(input_filename, output_filename, verbose=False, **kwargs):
     """
@@ -27,4 +28,16 @@ def convert(input_filename, output_filename, verbose=False, **kwargs):
     return output_filename
 
 
-    
+def stack_tifs(filenames, output_filename):
+    textfile=output_filename.replace('.tif','.txt')
+    with open(textfile, 'w+') as f:
+        files = ['"{}"'.format(fname) for fname in f]
+        files='\n'.join(filenames)
+        f.write(files)
+
+    subprocess.check_output(['gdalbuildvrt','-separate','-resolution','average','-input_file_list',textfile,output_filename,'-srcnodata','"-10000"'])
+    combined=gdal.Open(output_filename)
+    array=combined.ReadAsArray()
+    array = np.ma.masked_equal(array, -10000)
+    #print(array)
+    return array

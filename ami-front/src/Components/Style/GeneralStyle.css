@@ -26,7 +26,6 @@ button.close{
     background-color: inherit;
     margin: 5px;
     border-radius: 50%;
-    
 }
 button.close:hover{
     background-color: rgb(125,125,125,0.75);

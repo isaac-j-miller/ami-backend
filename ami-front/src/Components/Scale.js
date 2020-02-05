@@ -15,9 +15,30 @@ export default class Scale extends Component{
             }
         }
     }
+    getTitle(){
+        let index=this.props.parent.sideBarRef.current.state.activeOverlay;
+        if (index==='RGB'){
+            return '';
+        }
+        else if (index==='DSM'){
+            return 'Elevation (ft)';
+        }
+        else if (index=='Thermal'){
+            return `Temperature (${String.fromCharCode(176)}F)`;
+        }
+        else{
+            return index;
+        }
+
+    }
     render(){
         if(this.state.url!==null){
-            return <img src={this.state.url} alt='color scale' className={this.state.visible? 'color-scale': 'hidden-color-scale'}/>
+            return (
+                <div  className={this.state.visible? 'color-scale-div':'hidden-color-scale-div'}>
+                    <img src={this.state.url} alt='color scale' className='color-scale'/>
+                    <h1 className='scale-title'>{this.getTitle()}</h1>
+                </div>
+            )
         }
         else{
             return <div/>

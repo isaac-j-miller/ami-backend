@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import axios from 'axios'
 import styles from '../Components/Style/SideBarStyle.css'
 import backend from '../globals'
+import Spinner from './Spinner';
 class SideBar extends Component{
     constructor(props){
         super(props)
@@ -20,7 +21,8 @@ class SideBar extends Component{
             hidden:true,
             displayPinText:'Hide Pins',
             reqOverlayClass:'',
-            remOverlayClass:'hidden-button '
+            remOverlayClass:'hidden-button ',
+            spinnerActive:false
         }
         
         this.handleFieldChange = this.handleFieldChange.bind(this);
@@ -149,6 +151,7 @@ class SideBar extends Component{
             field=newField;
         }
         //console.log(this.state)
+        this.setState({spinnerActive:true});
         axios.get(`${backend.value}/overlays/req/request_overlay/?user=${this.state.user}&field=${field}&date=${date}&index_name=${overlay}`)
         .then(res =>{
             const info = res.data;
@@ -166,7 +169,7 @@ class SideBar extends Component{
                 this.setState({remOverlayClass:''})
                 
                 this.props.parent.scaleRef.current.setState({visible:!(this.state.activeOverlay==='RGB')});
-            
+                this.setState({spinnerActive:false});
             }
 
             
@@ -243,6 +246,14 @@ class SideBar extends Component{
 
         }
     }
+    getSpinner(){
+        if(this.state.spinnerActive){
+            return <Spinner caption={`Loading ${this.state.activeOverlay}`}/>
+        }
+        else{
+            return <div/>
+        }
+    }
     render(){
         //console.log(this.state);
         return (
@@ -283,7 +294,7 @@ class SideBar extends Component{
                         {this.getInfoBody()}
                     </p>
                 </div>
-                
+                {this.getSpinner()}
             </div>
         )
     }

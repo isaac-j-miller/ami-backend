@@ -8,6 +8,7 @@ import Uploader from './Components/Uploader'
 import axios from 'axios'
 import styles from './Components/Style/AppStyle.css'
 import backend from './globals'
+import Spinner from './Components/Spinner'
 
 
 class App extends React.Component {
@@ -30,7 +31,8 @@ class App extends React.Component {
       overlays:[],
       activeOverlay:'',
       loggedIn: false,
-      origins: null
+      origins: null,
+      sidebarClass: 'hidden'
   } 
   componentDidMount(){
     console.log(backend)
@@ -92,7 +94,7 @@ class App extends React.Component {
       <div className='nav-bar-wrapper'>
         <NavBar parent={this} id='toolbar' ref={this.toolBarRef}/>
       </div>
-      <div className='side-bar-wrapper'>
+      <div className={`side-bar-wrapper ${this.state.sidebarClass}`}>
         <SideBar parent={this} id='sidebar' ref={this.sideBarRef}/>
       </div>
       <div className='scale-wrapper'>
@@ -104,6 +106,7 @@ class App extends React.Component {
       <div className='uploader-wrapper'>
         {this.renderUpload()}
       </div>
+      
      </div>
    )
   }

@@ -29,6 +29,9 @@
     position: fixed;
     top:9vh;
 }
+.hidden{
+    
+}
 .map-wrapper{
     z-index: 0;
     position: fixed;

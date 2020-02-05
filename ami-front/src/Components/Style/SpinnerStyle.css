@@ -1,0 +1,29 @@
+@import 'GeneralStyle.css';
+.visible-spinner{
+    position: fixed;
+    transform: translate(-50%,-50%);
+    top: 50%;
+    left: 50%;
+    z-index: 200;
+    background-color: white;
+    border-radius: 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    max-width: 25vh;
+}
+.hidden-spinner{
+    display: none;
+}
+.spinner-img{
+    position: relative;
+    height: 20vh;
+    width: 20vh;
+    align-self: center;
+}
+.spinner-caption{
+    margin-left: 1rem;
+    margin-right:1rem;
+    align-self: center;
+    text-align: center;
+}

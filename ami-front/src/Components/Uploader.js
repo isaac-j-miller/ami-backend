@@ -18,6 +18,7 @@ export default class Uploader extends Component{
             date:'',
             fieldsArray:[],
             addingField:false,
+            camera:'Micasense Altum'
         }
         this.s3Ref=React.createRef();
         //this.onProgress=this.onProgress.bind(this);
@@ -30,6 +31,7 @@ export default class Uploader extends Component{
         this.onDateChange=this.onDateChange.bind(this);
         this.addField=this.addField.bind(this);
         this.onAddFieldChange=this.onAddFieldChange.bind(this);
+        this.onCameraChange=this.onCameraChange.bind(this);
     }
     getDivClassName(){
         if(this.state.visible){
@@ -85,7 +87,13 @@ export default class Uploader extends Component{
         let user = this.props.parent.state.user;
         let field=this.state.field;
         let date=this.state.date;
-        let bands = ['blue', 'green', 'red', 'nir', 'red_edge', 'lwir'];
+        let bands;
+        if (this.state.camera==='Micasense Altum'){
+            bands = ['blue', 'green', 'red', 'nir', 'red_edge', 'lwir'];
+        }
+        else if (this.state.camera==='Micasense RedEdge'){
+            bands = ['blue', 'green', 'red', 'nir', 'red_edge'];
+        }
         promise.then(
             function(data) {
                 console.log(data);
@@ -148,6 +156,9 @@ export default class Uploader extends Component{
     onAddFieldChange(event){
         this.setState({field: event.target.value})
     }
+    onCameraChange(event){
+        this.setState({camera: event.target.value})
+    }
     render(){
         return (
             <div className={this.getDivClassName()}>
@@ -169,6 +180,13 @@ export default class Uploader extends Component{
                             </label>
                             <input type='button' value='Add Field' onClick={this.addField}/>
                         </div>
+                        <label>
+                            Camera:
+                            <select onChange={this.onCameraChange}>
+                                <option key={0} value='Micasense Altum'>Micasense Altum</option>
+                                <option key={1} value='Micasense RedEdge'>Micasense RedEdge</option>
+                            </select>
+                        </label>
                         <label>
                             Date:
                             <input type='date' onChange={this.onDateChange}/>
