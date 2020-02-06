@@ -29,6 +29,7 @@ pip3 install djangorestframework
 pip3 install boto3
 pip3 install awscli
 pip3 install rasterio
+pip3 install gunicorn
 #configure github
 git config --global user.name “isaac-j-miller”
 git config --global user.email “miller.isaac96@gmail.com”
