@@ -8,4 +8,4 @@ cd ~/git_repo/ami-backend/ami
 xterm -title 'backend server' -e 'python3 manage.py runserver 0.0.0.0:8000' &
 cd ~/git_repo/ami-backend/ami-front
 npm run build
-xterm -title 'frontend server' -e 'npm deploy' &
+xterm -title 'frontend server' -e 'npm start' &
