@@ -15,6 +15,7 @@ npm install react
 npm install react-scripts
 npm install aws-sdk
 npm install react-dropzone
+npm install -g serve
 #install python libs
 pip3 install matplotlib
 pip3 install wheel
