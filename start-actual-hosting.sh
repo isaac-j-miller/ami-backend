@@ -7,4 +7,5 @@ sed -i 's/DEBUG\s?=\s?True/DEBUG = False/g' settings.py
 cd ~/git_repo/ami-backend/ami
 xterm -title 'backend server' -e 'python3 manage.py runserver 0.0.0.0:8000' &
 cd ~/git_repo/ami-backend/ami-front
-xterm -title 'frontend server' -e 'npm start' &
+npm run build
+xterm -title 'frontend server' -e 'npm deploy' &
