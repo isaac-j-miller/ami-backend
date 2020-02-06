@@ -38,6 +38,40 @@ def stack_tifs(filenames, output_filename):
     subprocess.check_output(['gdalbuildvrt','-separate','-resolution','average','-input_file_list',textfile,output_filename,'-srcnodata','"-10000"'])
     combined=gdal.Open(output_filename)
     array=combined.ReadAsArray()
-    array = np.ma.masked_equal(array, -10000)
-    #print(array)
-    return array
+    maxLefts=[]
+    minRights=[]
+    minTops=[]
+    maxBottoms=[]
+    
+    print(array.shape)
+    for arr in array:
+        m=np.ma.masked_where(arr,arr==-10000).mask
+        validRows=[i for i in range(m.shape[0]) if not np.all(m[i])]
+        mTran=np.transpose(m)
+        validCols=[i for i in range(m.shape[1]) if not np.all(mTran[i])]
+        maxLefts.append(min(validCols))
+        minRights.append(max(validCols))
+        maxBottoms.append(min(validRows))
+        minTops.append(max(validRows))
+    
+    print(maxLefts,minRights,minTops,maxBottoms)
+    maxLeft=max(maxLefts)
+    minRight=min(minRights)
+    minTop=min(minTops)
+    maxBottom=max(maxBottoms)
+    print(maxLeft,minRight,maxBottom,minTop)
+    croppedArray=array[:,maxLeft:minRight,maxBottom:minTop]
+    
+    mask=np.full(croppedArray[0].shape,False)
+    for arr in croppedArray:
+        m=np.ma.masked_where(arr==-10000,arr).mask
+        mask=np.logical_or(mask,m)
+
+    return croppedArray, mask
+
+def crop_to_bbox(bbox, input_filename, output_filename):
+    f=gdal.Open(input_filename)
+    f=gdal.Translate(output_filename,f, projWin=bbox)
+    f=None
+    return output_filename
+

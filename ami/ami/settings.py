@@ -21,22 +21,26 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'by^)vsrdoj&2h8z)(1cps8)l-q*m2(l$4ocmcey9b@%nl16vhk'
-
+SECURE_SSL_REDIRECT=True
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 CORS_ORIGIN_ALLOW_ALL = False
 CORS_ORIGIN_WHITELIST=[ 
     'http://localhost:3000',
     'http://3.219.163.17:3000',
-    'http://app.skyprecision.net'
+    'https://3.219.163.17:3000',
+    'http://app.skyprecision.net',
+    'https://app.skyprecision.net'
  ]
 ALLOWED_HOSTS = [
     '3.219.163.17',
     'http://3.219.163.17',
+    'https://3.219.163.17',
     'localhost',
     'http://localhost',
     '127.0.0.1',
     'http://127.0.0.1',
+    'https://127.0.0.1'
     ]
 
 # Application definition
